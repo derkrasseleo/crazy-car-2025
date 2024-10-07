@@ -1,3 +1,13 @@
+/*
+ * hal_gpio.h
+ *
+ *  Created on: Oct 7, 2024
+ *      Author: leo
+ */
+
+#ifndef HAL_HAL_GPIO_H_
+#define HAL_HAL_GPIO_H_
+
 // Port 1
 #define RPM_SENSOR BIT3
 #define RPM_SENSOR_DIR BIT4
@@ -52,3 +62,6 @@
 // Port 9
 #define LCD_RESET BIT0
 #define DISTANCE_RIGHT_EN BIT7
+
+
+#endif /* HAL_HAL_GPIO_H_ */
