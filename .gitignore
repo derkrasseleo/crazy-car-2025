@@ -1,4 +1,4 @@
-.*
-!.gitignore
-# .metadata/
-# /.jxbrowser.userdata/
+.metadata/
+.jxbrowser.userdata/
+RemoteSystemsTempFiles
+dvt

@@ -73,7 +73,6 @@ void HAL_GPIO_Init() {
     // Inputs
     setOut(P9DIR, LCD_RESET);
     setOut(P9DIR, DISTANCE_RIGHT_EN);
-
     // Outputs
 
 
