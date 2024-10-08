@@ -25,7 +25,7 @@ void HAL_GPIO_Init() {
     // Inputs
     setIn(P2DIR, DEBUG_TXD);
     setIn(P2DIR, DEBUG_TXD);
-    setIn(P2DIR, IC2_SDA_MOTION)
+    setIn(P2DIR, IC2_SDA_MOTION);
     // Outputs
     setOut(P2DIR, DEBUG_RXD);
     setOut(P2DIR, IC2_SCL_MOTION);
@@ -39,7 +39,7 @@ void HAL_GPIO_Init() {
     // Inputs
     setIn(P4DIR, LINE_FOLLOW_2);
     setIn(P4DIR, LINE_FOLLOW_1);
-    setIn(P4DIR, LINE_FOLLOW_3;
+    setIn(P4DIR, LINE_FOLLOW_3);
     setIn(P4DIR, LINE_FOLLOW_4);
     setIn(P4DIR, LINE_FOLLOW_5);
     // Outputs
@@ -63,7 +63,6 @@ void HAL_GPIO_Init() {
     // Inputs
     setIn(P8DIR, UART_RXD_AUX);
     setIn(P8DIR, LCS_SPI_MISO);
-    UART_TXD_AUX
     // Outputs
     setOut(P8DIR, LCD_BL);
     setOut(P8DIR, UART_TXD_AUX);
