@@ -8,6 +8,15 @@
 #ifndef HAL_HAL_GPIO_H_
 #define HAL_HAL_GPIO_H_
 
+#define XTAL_FREQU 20000000
+#define MCLK_FREQU 20000000
+#define SMCLK_FREQU 2500000
+
+typedef struct {
+unsigned char active; // TRUE 1 / FALSE 0
+unsigned char button; // Button number
+}ButtonCom;
+
 // Port 1
 #define RPM_SENSOR BIT3
 #define RPM_SENSOR_DIR BIT4
@@ -63,5 +72,12 @@
 #define LCD_RESET BIT0
 #define DISTANCE_RIGHT_EN BIT7
 
+// Makros
+#define LCD_BACKLIGHT_ON (P8OUT |= LCD_BL)
+#define LCD_BACKLIGHT_OFF (P8OUT &= ~LCD_BL)
+#define LCD_BACKLIGHT_TOGGLE (P8OUT ^= LCD_BL)
+
+#define setOne(adr,bit) (adr |= bit)
+#define setZero(adr, bit) (adr &= ~(bit))
 
 #endif /* HAL_HAL_GPIO_H_ */

@@ -8,8 +8,22 @@
 #include <msp430.h>
 #include "hal_gpio.h"
 
-#define setOne(adr,bit) (adr |= bit)
-#define setZero(adr, bit) (adr &= ~(bit))
+extern ButtonCom button;
+
+void HAL_UCS_Init() {
+    UCSCTL6 &= ~XT2OFF; // Enable XT2
+    UCSCTL3 |= SELREF_2; // Set Frequency of locked loop to REFCLK
+    UCSCTL4 |= SELA_2; // Set ACLK to REFCLOCK
+    while(SFRIFG1 & OFIFG) // Wait until all error flags are cleared and not set again
+    {
+       UCSCTL7 &= ~(XT2OFFG + DCOFFG + XT1HFOFFG + XT1LFOFFG);
+       SFRIFG1 &= ~OFIFG;
+    }
+
+    UCSCTL6 |= XT2DRIVE_3; // Set Drive-Strength in UCSCTL6 (16 to 24 MHz)
+    UCSCTL4 |= (SELM_5 + SELS_5 + SELA_5); // Set Submaster-Clock and Master-Clock (UCSCTL4)
+    UCSCTL5 |= DIVS__8; // Set new Submaster-Clocks (UCSCTL5)
+}
 
 void HAL_GPIO_Init() {
     // Port 1
@@ -57,6 +71,8 @@ void HAL_GPIO_Init() {
     setZero(P3DIR, STEERING);
     // Outputs
     setOne(P3DIR, DISTANCE_FRONT_EN);
+    setOne(P3DIR, SMCLK);
+    setOne(P3SEL, SMCLK);
     // Port 4
     P4SEL = 0x00;
     P4DIR = 0x00;
@@ -93,6 +109,10 @@ void HAL_GPIO_Init() {
     P7DIR = 0x00;
     P7REN = 0xFF;
     P7OUT = 0x00;
+    // Quartz IO
+    P7SEL |= XT2IN; // Crystal Oscilator
+    P7SEL |= XT2OUT; //
+    UCSCTL6 &= ~XT2BYPASS; // SMCLK pin to output the SMCLK
     // Inputs
     setZero(P7DIR, XT2IN);
     // Outputs
@@ -121,5 +141,9 @@ void HAL_GPIO_Init() {
     setOne(P9DIR, DISTANCE_RIGHT_EN);
     // Outputs
 
+    // Set General Interrupt Enable Bit
+    __enable_interrupt();
+
+    setZero(TB0CTL, TBIFG); // Clear
 
 }
