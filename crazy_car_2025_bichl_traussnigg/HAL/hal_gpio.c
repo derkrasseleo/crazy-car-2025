@@ -35,10 +35,10 @@ void HAL_GPIO_Init() {
     setZero(P1DIR, RPM_SENSOR);
     setZero(P1DIR, RPM_SENSOR_DIR);
     // Buttons
-    setZero(P1DIR, START_BUTTON); // TODO:
+    setZero(P1DIR, START_BUTTON);
     setOne(P1REN, START_BUTTON); // Enable Pull Up/Down Resistor
     setOne(P1OUT, START_BUTTON); // PullUp selected
-    setZero(P1DIR, STOP_BUTTON); // TODO: Pull Up/Down
+    setZero(P1DIR, STOP_BUTTON);
     setOne(P1REN, STOP_BUTTON);
     setOne(P1OUT, STOP_BUTTON);
     // Outputs
@@ -67,9 +67,12 @@ void HAL_GPIO_Init() {
     P3REN = 0xFF;
     P3OUT = 0x00;
     // Inputs
-    setZero(P3DIR, THROTTLE);
-    setZero(P3DIR, STEERING);
+
     // Outputs
+    setOne(P3DIR, THROTTLE);
+    setOne(P3SEL, THROTTLE);
+    setOne(P3DIR, STEERING);
+    setOne(P3SEL, STEERING);
     setOne(P3DIR, DISTANCE_FRONT_EN);
     setOne(P3DIR, SMCLK);
     setOne(P3SEL, SMCLK);
@@ -145,5 +148,6 @@ void HAL_GPIO_Init() {
     __enable_interrupt();
 
     setZero(TB0CTL, TBIFG); // Clear
+    setZero(TA1CTL, TBIFG);
 
 }

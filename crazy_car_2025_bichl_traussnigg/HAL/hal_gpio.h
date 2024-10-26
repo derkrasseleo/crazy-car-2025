@@ -12,6 +12,9 @@
 #define MCLK_FREQU 20000000
 #define SMCLK_FREQU 2500000
 
+void HAL_UCS_Init();
+void HAL_GPIO_Init();
+
 typedef struct {
 unsigned char active; // TRUE 1 / FALSE 0
 unsigned char button; // Button number

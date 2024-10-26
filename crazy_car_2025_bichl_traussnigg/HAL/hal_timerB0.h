@@ -8,8 +8,6 @@
 #ifndef HAL_HAL_TIMERB0_H_
 #define HAL_HAL_TIMERB0_H_
 
-
-
-
+void HAL_TimerB0_Init();
 
 #endif /* HAL_HAL_TIMERB0_H_ */
