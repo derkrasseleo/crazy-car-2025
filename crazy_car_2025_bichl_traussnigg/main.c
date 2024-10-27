@@ -13,7 +13,12 @@ int main(void)
 {
 	HAL_Init();
 
-	TA1CCR2 = 3750; // 1250 bis 4750
+	// TODO: Fix Crash when car moves
+
+	int increment = 100;
+    int steer_min = 2800;
+	int steer_max = 4400;
+	int steer_pc = (steer_max-steer_min)/100;
 
 	while(1) {
 	    if (button.active == 1)
@@ -21,13 +26,17 @@ int main(void)
 	        if (button.button == 1)
 	        {
 	            LCD_BACKLIGHT_ON;
-	            TA1CCR2 += 10;
+	            if (TA1CCR2 < (steer_max-increment))
+	                TA1CCR2 += 5*steer_pc;
 	        }
 	        else if (button.button == 2)
 	        {
                 LCD_BACKLIGHT_OFF;
-                TA1CCR2 -= 10;
+                if (TA1CCR2 > (steer_min+increment))
+                    TA1CCR2 -= 5*steer_pc;
 	        }
+            __delay_cycles(10000);
+            button.active = 0;
 	    }
 	}
 	return 0;
