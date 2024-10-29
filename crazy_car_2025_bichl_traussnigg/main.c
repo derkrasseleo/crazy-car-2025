@@ -19,6 +19,7 @@ int main(void)
     int steer_min = 2800;
 	int steer_max = 4400;
 	int steer_pc = (steer_max-steer_min)/100;
+	//TA1CCR1 = 10;
 
 	while(1) {
 	    if (button.active == 1)

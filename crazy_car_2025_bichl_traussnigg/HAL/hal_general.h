@@ -9,7 +9,5 @@
 #define HAL_HAL_GENERAL_H_
 
 void HAL_Init();
-void HAL_PMM_Init();
-
 
 #endif /* HAL_HAL_GENERAL_H_ */

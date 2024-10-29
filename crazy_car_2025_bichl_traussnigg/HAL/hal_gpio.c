@@ -27,6 +27,7 @@ void HAL_UCS_Init() {
 
 void HAL_GPIO_Init() {
     // Port 1
+    // Initialize all pins to be inputs with Pullups by default
     P1SEL = 0x00;
     P1DIR = 0x00;
     P1REN = 0xFF;
@@ -35,7 +36,7 @@ void HAL_GPIO_Init() {
     setZero(P1DIR, RPM_SENSOR);
     setZero(P1DIR, RPM_SENSOR_DIR);
     // Buttons
-    setZero(P1DIR, START_BUTTON);
+    setZero(P1DIR, START_BUTTON); // Set to input
     setOne(P1REN, START_BUTTON); // Enable Pull Up/Down Resistor
     setOne(P1OUT, START_BUTTON); // PullUp selected
     setZero(P1DIR, STOP_BUTTON);
@@ -43,11 +44,11 @@ void HAL_GPIO_Init() {
     setOne(P1OUT, STOP_BUTTON);
     // Outputs
     setOne(P1DIR, I2C_INT_MOTION);
-    // Interrupt
-    setOne(P1IE, START_BUTTON);
+    // Interrupts
+    setOne(P1IE, START_BUTTON); // Enable interrupt on pin
     setZero(P1IES, START_BUTTON); // Rising Edge
     setOne(P1IE, STOP_BUTTON);
-    setZero(P1IES, STOP_BUTTON); // Rising Edge
+    setZero(P1IES, STOP_BUTTON);
     setZero(P1IFG, 0xFF); // Clear
     // Port 2
     P2SEL = 0x00;
