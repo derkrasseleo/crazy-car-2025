@@ -9,6 +9,7 @@
 #include "hal_gpio.h"
 #include "hal_wd_timer.h"
 #include "hal_pmm.h"
+#include "hal_ucs.h"
 #include "hal_timerB0.h"
 #include "hal_timerA1.h"
 

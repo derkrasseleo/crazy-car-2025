@@ -43,12 +43,12 @@ int main(void)
 	return 0;
 }
 
-//#pragma vector = TIMER0_B0_VECTOR // (fuer CCR0)
-//
-//__interrupt void T0_ISR (void) {
-//    LCD_BACKLIGHT_ON;
-//    TB0CTL &= ~TBIFG;
-//}
+#pragma vector = TIMER0_B0_VECTOR // (fuer CCR0)
+
+__interrupt void T0_ISR (void) {
+    LCD_BACKLIGHT_TOGGLE;
+    TB0CTL &= ~TBIFG;
+}
 
 //#pragma vector = TIMER1_A0_VECTOR // (fuer CCR0)
 //

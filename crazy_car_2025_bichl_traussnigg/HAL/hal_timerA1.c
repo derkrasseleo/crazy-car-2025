@@ -25,4 +25,6 @@ void HAL_TimerA1_Init() {
     TA1CCR2 = 3525; // Calibration: Center | Max_Right:  4400 | Max_left: 2700 | radius: 30cm
 
     TA1CTL |= MC__UP; // Up mode
+
+    TA1CTL &= ~TBIFG; // Clear Interrupt flag
 }
