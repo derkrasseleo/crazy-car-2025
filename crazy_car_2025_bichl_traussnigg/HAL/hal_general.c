@@ -12,6 +12,7 @@
 #include "hal_ucs.h"
 #include "hal_timerB0.h"
 #include "hal_timerA1.h"
+#include "DL/driver_aktorik.h"
 
 ButtonCom button;
 
@@ -22,6 +23,8 @@ void HAL_Init() {
     HAL_UCS_Init();
     HAL_TimerB0_Init();
     HAL_TimerA1_Init();
+    Driver_SteeringInit();
+    Driver_ESCInit();
 }
 
 

@@ -1,6 +1,7 @@
 #include <msp430.h>
 #include "hal_general.h"
 #include "hal_gpio.h"
+#include "DL/driver_aktorik.h"
 // #include <stdbool.h>
 
 /**
@@ -13,28 +14,27 @@ int main(void)
 {
 	HAL_Init();
 
-	// TODO: Fix Crash when car moves
+	// TODO: Fix Crash when signal from hall sensor
 
-	int increment = 100;
-    int steer_min = 2800;
-	int steer_max = 4400;
-	int steer_pc = (steer_max-steer_min)/100;
-	//TA1CCR1 = 10;
+	unsigned char percent = 50;
+
 
 	while(1) {
+	    Driver_SetThrottle(percent);
 	    if (button.active == 1)
 	    {
 	        if (button.button == 1)
 	        {
 	            LCD_BACKLIGHT_ON;
-	            if (TA1CCR2 < (steer_max-increment))
-	                TA1CCR2 += 5*steer_pc;
+	            percent+=5;
+	            Driver_SetSteering(percent);
+
 	        }
 	        else if (button.button == 2)
 	        {
                 LCD_BACKLIGHT_OFF;
-                if (TA1CCR2 > (steer_min+increment))
-                    TA1CCR2 -= 5*steer_pc;
+                percent-=5;
+                Driver_SetSteering(percent);
 	        }
             __delay_cycles(10000);
             button.active = 0;
@@ -46,16 +46,9 @@ int main(void)
 #pragma vector = TIMER0_B0_VECTOR // (fuer CCR0)
 
 __interrupt void T0_ISR (void) {
-    LCD_BACKLIGHT_TOGGLE;
+    //LCD_BACKLIGHT_TOGGLE;
     TB0CTL &= ~TBIFG;
 }
-
-//#pragma vector = TIMER1_A0_VECTOR // (fuer CCR0)
-//
-//__interrupt void T1_CCR0_ISR (void) {
-//    LCD_BACKLIGHT_ON;
-//    TB0CTL &= ~TBIFG;
-//}
 
 //#pragma vector = TIMER1_A1_VECTOR // (fuer CCR1 und CCR2)
 //
@@ -90,6 +83,7 @@ __interrupt void P1_ISR (void) {
         default:
             button.active = 0;
             button.button = 0;
+            P1IFG = 0x00;
     }
 }
 
