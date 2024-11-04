@@ -1,10 +1,3 @@
-/*
- * driver_aktorik.h
- *
- *  Created on: Oct 28, 2024
- *      Author: leo
- */
-
 #ifndef DL_DRIVER_AKTORIK_H_
 #define DL_DRIVER_AKTORIK_H_
 

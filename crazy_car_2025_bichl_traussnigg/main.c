@@ -2,13 +2,12 @@
 #include "hal_general.h"
 #include "hal_gpio.h"
 #include "DL/driver_aktorik.h"
-// #include <stdbool.h>
-
-/**
- * main.c
- */
+#include "hal_usciB1.h"
 
 extern ButtonCom button;
+extern USCIB1_SPICom spi;
+
+unsigned char percent = 50;
 
 int main(void)
 {
@@ -16,25 +15,24 @@ int main(void)
 
 	// TODO: Fix Crash when signal from hall sensor
 
-	unsigned char percent = 50;
-
-
 	while(1) {
 	    Driver_SetThrottle(percent);
+        Driver_SetSteering(percent);
 	    if (button.active == 1)
 	    {
 	        if (button.button == 1)
 	        {
 	            LCD_BACKLIGHT_ON;
-	            percent+=5;
-	            Driver_SetSteering(percent);
+	            if(percent<100)
+	                percent+=5;
 
 	        }
 	        else if (button.button == 2)
 	        {
                 LCD_BACKLIGHT_OFF;
-                percent-=5;
-                Driver_SetSteering(percent);
+                if(percent>0)
+                    percent-=5;
+                HAL_USCIB1_Transmit(0x02);
 	        }
             __delay_cycles(10000);
             button.active = 0;
@@ -59,16 +57,6 @@ __interrupt void T0_ISR (void) {
 #pragma vector = PORT1_VECTOR
 
 __interrupt void P1_ISR (void) {
-//    if(P1IFG & STOP_BUTTON) {
-//        button.active = 1;
-//        button.button = 0;
-//        P1IFG &= ~STOP_BUTTON;
-//    }
-//    else if(P1IFG & START_BUTTON) {
-//        button.active = 1;
-//        button.button = 1;
-//        P1IFG &= ~START_BUTTON;
-//    }
     switch P1IFG {
         case STOP_BUTTON:
             button.active = 1;

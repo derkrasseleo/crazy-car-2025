@@ -1,10 +1,3 @@
-/*
- * hal_gpio.h
- *
- *  Created on: Oct 7, 2024
- *      Author: leo
- */
-
 #ifndef HAL_HAL_GPIO_H_
 #define HAL_HAL_GPIO_H_
 

@@ -1,9 +1,3 @@
-/*
- * driver_aktorik.c
- *
- *  Created on: Oct 28, 2024
- *      Author: leo
- */
 #include <msp430.h>
 
 const int MaxRPW = 2500;
@@ -16,14 +10,16 @@ volatile int speed_controller_impuls = 0;
 
 void Driver_SetSteering(unsigned char steer_angle_pc)
 {
-
-    int increment = 100;
     int steer_min = 2900;
     int steer_max = 4300;
     int steer_pc = (steer_max-steer_min)/100;
 
-    if (TA1CCR2 < (steer_max-increment) && TA1CCR2 > (steer_min+increment))
-        TA1CCR2 = steer_min+(steer_pc*steer_angle_pc);
+    TA1CCR2 = steer_min+(steer_pc*steer_angle_pc);
+
+    //    if (TA1CCR2 < (steer_max-increment) && TA1CCR2 > (steer_min+increment))
+//        TA1CCR2 = steer_min+(steer_pc*steer_angle_pc);
+//    else
+//        TA1CCR2 = steer_min+((steer_max-steer_min)/2);
 }
 
 void Driver_SteeringInit(void)

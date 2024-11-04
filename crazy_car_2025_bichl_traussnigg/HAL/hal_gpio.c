@@ -1,14 +1,5 @@
-/*
- * hal_gpio.c
- *
- *  Created on: Oct 4, 2024
- *      Author: leo
- */
-
 #include <msp430.h>
 #include "hal_gpio.h"
-
-extern ButtonCom button;
 
 void HAL_GPIO_Init() {
     // Port 1
