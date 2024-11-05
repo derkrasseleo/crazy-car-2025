@@ -13,6 +13,10 @@ int main(void)
 {
 	HAL_Init();
 
+	spi.TxData.Data[0] = 0x69;
+	spi.TxData.len = 1;
+	spi.TxData.cnt = 0;
+
 	// TODO: Fix Crash when signal from hall sensor
 
 	while(1) {
@@ -32,7 +36,7 @@ int main(void)
                 LCD_BACKLIGHT_OFF;
                 if(percent>0)
                     percent-=5;
-                HAL_USCIB1_Transmit(0x02);
+                HAL_USCIB1_Transmit();
 	        }
             __delay_cycles(10000);
             button.active = 0;

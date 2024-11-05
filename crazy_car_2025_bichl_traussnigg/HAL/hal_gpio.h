@@ -54,10 +54,10 @@ unsigned char button; // Button number
 #define LCD_SPI_CS BIT1
 #define UART_TXD_AUX BIT2
 #define UART_RXD_AUX BIT3
-#define LCS_SPI_CLK BIT4
-#define LCS_SPI_MOSI BIT5
-#define LCS_SPI_MISO BIT6
-#define LCS_SPI_DATACMD BIT7
+#define LCD_SPI_CLK BIT4
+#define LCD_SPI_MOSI BIT5
+#define LCD_SPI_MISO BIT6
+#define LCD_SPI_DATACMD BIT7
 
 // Port 9
 #define LCD_RESET BIT0
@@ -67,6 +67,10 @@ unsigned char button; // Button number
 #define LCD_BACKLIGHT_ON (P8OUT |= LCD_BL)
 #define LCD_BACKLIGHT_OFF (P8OUT &= ~LCD_BL)
 #define LCD_BACKLIGHT_TOGGLE (P8OUT ^= LCD_BL)
+
+#define CS_HIGH (P8OUT |= LCD_SPI_CS)
+#define CS_LOW (P8OUT &= ~LCD_SPI_CS)
+#define CS_TOGGLE (P8OUT ^= LCD_SPI_CS)
 
 #define setOne(adr,bit) (adr |= bit)
 #define setZero(adr, bit) (adr &= ~(bit))

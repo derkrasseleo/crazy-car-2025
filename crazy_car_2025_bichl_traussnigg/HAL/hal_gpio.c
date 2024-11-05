@@ -104,13 +104,18 @@ void HAL_GPIO_Init() {
     P8OUT = 0x00;
     // Inputs
     setZero(P8DIR, UART_RXD_AUX);
-    setZero(P8DIR, LCS_SPI_MISO);
+    setZero(P8DIR, LCD_SPI_MISO);
+    setOne(P8SEL, LCD_SPI_MISO);
     // Outputs
     setOne(P8DIR, LCD_BL);
+    setOne(P8DIR, LCD_SPI_CS);
+    setOne(P8SEL, LCD_SPI_CS);
     setOne(P8DIR, UART_TXD_AUX);
-    setOne(P8DIR, LCS_SPI_CLK);
-    setOne(P8DIR, LCS_SPI_MOSI);
-    setOne(P8DIR, LCS_SPI_DATACMD);
+    setOne(P8DIR, LCD_SPI_CLK);
+    setOne(P8SEL, LCD_SPI_CLK);
+    setOne(P8DIR, LCD_SPI_MOSI);
+    setOne(P8SEL, LCD_SPI_MOSI);
+    setOne(P8DIR, LCD_SPI_DATACMD);
     // Port 9
     P9SEL = 0x00;
     P9DIR = 0x00;
