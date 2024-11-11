@@ -3,6 +3,7 @@
 #include "hal_gpio.h"
 #include "DL/driver_aktorik.h"
 #include "hal_usciB1.h"
+#include "DL/driver_general.h"
 
 extern ButtonCom button;
 extern USCIB1_SPICom spi;
@@ -12,9 +13,12 @@ unsigned char percent = 50;
 int main(void)
 {
 	HAL_Init();
+	Driver_Init();
 
 	spi.TxData.Data[0] = 0x69;
-	spi.TxData.len = 1;
+	spi.TxData.Data[1] = 0x42;
+	spi.TxData.Data[2] = 0x18;
+	spi.TxData.len = 3;
 	spi.TxData.cnt = 0;
 
 	// TODO: Fix Crash when signal from hall sensor
