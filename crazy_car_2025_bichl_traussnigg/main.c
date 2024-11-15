@@ -4,6 +4,7 @@
 #include "DL/driver_aktorik.h"
 #include "hal_usciB1.h"
 #include "DL/driver_general.h"
+#include "DL/driver_lcd.h"
 
 extern ButtonCom button;
 extern USCIB1_SPICom spi;
@@ -15,44 +16,46 @@ int main(void)
 	HAL_Init();
 	Driver_Init();
 
-	spi.TxData.Data[0] = 0x69;
-	spi.TxData.Data[1] = 0x42;
-	spi.TxData.Data[2] = 0x18;
-	spi.TxData.len = 3;
-	spi.TxData.cnt = 0;
-
 	// TODO: Fix Crash when signal from hall sensor
 
-	while(1) {
-	    Driver_SetThrottle(percent);
-        Driver_SetSteering(percent);
-	    if (button.active == 1)
-	    {
-	        if (button.button == 1)
-	        {
-	            LCD_BACKLIGHT_ON;
-	            if(percent<100)
-	                percent+=5;
+    while (1) {
 
-	        }
-	        else if (button.button == 2)
-	        {
-                LCD_BACKLIGHT_OFF;
-                if(percent>0)
-                    percent-=5;
-                HAL_USCIB1_Transmit();
-	        }
-            __delay_cycles(10000);
-            button.active = 0;
-	    }
-	}
+        Driver_SetThrottle(percent);
+        Driver_SetSteering(percent);
+
+        if (button.active) {
+            switch (button.button) {
+                case 1:
+                    Driver_LCD_WriteText("CRAZY CAR 2025", 14, 4, 0);
+
+                    LCD_BACKLIGHT_ON;
+
+                    if (percent < 100)
+                        percent += 5;
+                    break;
+
+                case 2:
+                    LCD_BACKLIGHT_OFF;
+                    Driver_LCD_Clear();
+//                    HAL_USCIB1_SPI_TEST();
+                    if (percent > 0)
+                        percent -= 5;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        __delay_cycles(1000);
+        button.active = 0; // Button-Zustand zurücksetzen
+    }
 	return 0;
 }
 
 #pragma vector = TIMER0_B0_VECTOR // (fuer CCR0)
 
 __interrupt void T0_ISR (void) {
-    //LCD_BACKLIGHT_TOGGLE;
+//    LCD_BACKLIGHT_TOGGLE;
     TB0CTL &= ~TBIFG;
 }
 
@@ -82,4 +85,3 @@ __interrupt void P1_ISR (void) {
             P1IFG = 0x00;
     }
 }
-
