@@ -14,9 +14,16 @@
 #define LCD_COMMAND (P8OUT=(P8OUT & ~LCD_SPI_DATACMD))
 #define LCD_DATA (P8OUT=(P8OUT | LCD_SPI_DATACMD))
 
-void Driver_LCD_WriteCommand (unsigned char *data, unsigned char len);
-void Driver_LCD_Init(void);
-void Driver_LCD_Clear(void);
-void Driver_LCD_SetCursor(void);
+#define SET_PAGE 0xB0
+#define LAST_PAGE 0xB7
+#define MSB_COL_ADDR 0x10 //0x10, 0x11,.., 0x1F für spalten über 16
+#define LSB_COL_ADDR 0x00 //0x01, 0x02,.., 0x0F für spalten bis 15
+#define LCD_MAX_COLM 6
+
+void Driver_LCD_Init();
+void Driver_LCD_Clear();
+void Driver_LCD_SetCursor(unsigned char page_sel , unsigned char col_sel);
+void Driver_LCD_WriteCommand(unsigned char *data, unsigned char len);
+void Driver_LCD_WriteText(char *text , unsigned char text_length , unsigned char page , unsigned char col);
 
 #endif /* DL_DRIVER_LCD_H_ */
