@@ -22,5 +22,6 @@ typedef struct {
 
 void HAL_USCIB1_Init(void);
 void HAL_USCIB1_Transmit(void);
+void HAL_USCIB1_SPI_TEST(void);
 
 #endif /* HAL_HAL_USCIB1_H_ */

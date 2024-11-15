@@ -14,39 +14,48 @@ void HAL_USCIB1_Init(void) {
     UCB1BR0 = 25; // Clock prescaler 2,5MHz / 25 = 100kHz
     UCB1BR1 = 0;
 
-//    __delay_cycles(100);
     UCB1CTL1 &= ~UCSWRST; // Reset off
     UCB1IE |= UCRXIE; // Enable RX interrupt
     P8OUT |= LCD_SPI_CS; // CS default high
+
+    spi.Status.TxSuc = 1;
+    CS_HIGH;
 }
 
 void HAL_USCIB1_Transmit(void) {
+    spi.Status.TxSuc = 0;
+    spi.TxData.cnt = 0;
     CS_LOW;
-    UCB1TXBUF = spi.TxData.Data[0];
+    UCB1TXBUF = spi.TxData.Data[spi.TxData.cnt];
     spi.TxData.cnt++;
+}
+
+void HAL_USCIB1_SPI_TEST(void) {
+    spi.TxData.Data[0] = 0x69;
+    spi.TxData.Data[1] = 0x42;
+    spi.TxData.Data[2] = 0x18;
+    spi.TxData.len = 3;
+    spi.TxData.cnt = 0;
+
+    HAL_USCIB1_Transmit();
 }
 
 #pragma vector = USCI_B1_VECTOR
 __interrupt void USCI_B1_ISR(void)
 {
-    CS_HIGH;
-    spi.RxData.Data[0] = UCB1RXBUF;
-    //  while (!(UCB1IFG&UCTXIFG));
+    spi.RxData.Data[0] = UCB1RXBUF; // Read RX Buffer to reset interrupt
+
     if ((UCB1IE & UCRXIE) && (spi.Status.TxSuc == 0))
     {
-//    CS_LOW;
-//    UCB1TXBUF = 0xAA;
-//    __delay_cycles(1000);
-//    CS_HIGH;
-
-
-    if(spi.TxData.cnt <= spi.TxData.len)
-    {
-        CS_LOW;
-        UCB1TXBUF = spi.TxData.Data[spi.TxData.cnt];
-        spi.TxData.cnt++;
-    }
-    else
-        spi.Status.TxSuc = 1;
+        if(spi.TxData.cnt <= spi.TxData.len)
+        {
+            UCB1TXBUF = spi.TxData.Data[spi.TxData.cnt];
+            spi.TxData.cnt++;
+        }
+        else
+        {
+            CS_HIGH;
+            spi.Status.TxSuc = 1;
+        }
     }
 }
