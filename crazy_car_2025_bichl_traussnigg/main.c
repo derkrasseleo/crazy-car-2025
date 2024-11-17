@@ -9,6 +9,10 @@
 extern ButtonCom button;
 extern USCIB1_SPICom spi;
 
+unsigned char ticks = 0;
+unsigned char speed = 0;
+unsigned char speed_old = 0;
+unsigned char speed_dd = 0;
 unsigned char percent = 50;
 
 int main(void)
@@ -56,6 +60,12 @@ int main(void)
 
 __interrupt void T0_ISR (void) {
 //    LCD_BACKLIGHT_TOGGLE;
+
+    // TODO: check if forwards or backwards
+    speed = (ticks*5)*10;
+    speed = (speed + speed_old) >> 1;
+    speed_old = speed;
+    ticks = 0;
     TB0CTL &= ~TBIFG;
 }
 
@@ -79,6 +89,16 @@ __interrupt void P1_ISR (void) {
             button.button = 2;
             P1IFG &= ~START_BUTTON;
         break;
+        case RPM_SENSOR:
+            ticks++;
+            P1IFG &= ~RPM_SENSOR;
+        break;
+        case RPM_SENSOR_DIR:
+            // TODO: invert value, maybe speed_dd ^= 1; ?
+            speed_dd = 1;
+            P1IFG &= ~RPM_SENSOR_DIR;
+        break;
+
         default:
             button.active = 0;
             button.button = 0;

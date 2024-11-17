@@ -25,6 +25,10 @@ void HAL_GPIO_Init() {
     setZero(P1IES, START_BUTTON); // Rising Edge
     setOne(P1IE, STOP_BUTTON);
     setZero(P1IES, STOP_BUTTON);
+    setOne(P1IE, RPM_SENSOR); // Enable interrupt on pin
+    setZero(P1IES, RPM_SENSOR); // Rising Edge
+    setOne(P1IE, RPM_SENSOR_DIR); // Enable interrupt on pin
+    setZero(P1IES, RPM_SENSOR_DIR); // Rising Edge
     setZero(P1IFG, 0xFF); // Clear
     // Port 2
     P2SEL = 0x00;
