@@ -8,6 +8,7 @@
 
 extern ButtonCom button;
 extern USCIB1_SPICom spi;
+extern ADC12Com adc;
 
 unsigned char ticks = 0;
 int speed = 0;

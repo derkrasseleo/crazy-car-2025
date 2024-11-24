@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 extern USCIB1_SPICom spi;
+extern ADC12Com adc;
 
 void HAL_USCIB1_Init(void) {
     UCB1CTL1 |= UCSWRST; // Reset
