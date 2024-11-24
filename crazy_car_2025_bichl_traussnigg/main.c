@@ -10,10 +10,12 @@ extern ButtonCom button;
 extern USCIB1_SPICom spi;
 
 unsigned char ticks = 0;
-unsigned char speed = 0;
-unsigned char speed_old = 0;
+int speed = 0;
+int speed_old = 0;
 unsigned char speed_dd = 0;
 unsigned char percent = 50;
+char test_text[5] = {48, 49, 50, 51, 52};
+int number = -100;
 
 int main(void)
 {
@@ -25,12 +27,16 @@ int main(void)
     while (1) {
 
         Driver_SetThrottle(percent);
-        Driver_SetSteering(percent);
+//        number++;
+//        Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
+//        __delay_cycles(10000000);
+//        Driver_SetSteering(percent);
 
         if (button.active) {
             switch (button.button) {
                 case 1:
-                    Driver_LCD_WriteText("CRAZY CAR 2025", 14, 4, 0);
+//                    Driver_LCD_WriteText(test_text, 5, 0, 0);
+                    Driver_LCD_WriteNumber(speed, 6, 4, 0);
 
                     LCD_BACKLIGHT_ON;
 
@@ -51,7 +57,7 @@ int main(void)
             }
         }
         __delay_cycles(1000);
-        button.active = 0; // Button-Zustand zurücksetzen
+        button.active = 0; // Reset button state
     }
 	return 0;
 }
@@ -60,15 +66,21 @@ int main(void)
 
 __interrupt void T0_ISR (void) {
 //    LCD_BACKLIGHT_TOGGLE;
-
     // TODO: check if forwards or backwards
-    speed = (ticks*5)*10;
+    speed = (ticks*10)*10; // *10 mm per tick * 10 Hz
     speed = (speed + speed_old) >> 1;
     speed_old = speed;
     ticks = 0;
     TB0CTL &= ~TBIFG;
 }
 
+#pragma vector = TIMER0_B1_VECTOR // (fuer CCR1)
+
+__interrupt void TB0_CCR1_ISR (void) {
+
+    Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
+    TB0CTL &= ~TBIFG;
+}
 //#pragma vector = TIMER1_A1_VECTOR // (fuer CCR1 und CCR2)
 //
 //__interrupt void T1_ISR (void) {
@@ -94,9 +106,10 @@ __interrupt void P1_ISR (void) {
             P1IFG &= ~RPM_SENSOR;
         break;
         case RPM_SENSOR_DIR:
-            // TODO: invert value, maybe speed_dd ^= 1; ?
-            speed_dd = 1;
+            // TODO: make speed value negative?
+            speed_dd = 1-speed_dd;
             P1IFG &= ~RPM_SENSOR_DIR;
+            LCD_BACKLIGHT_TOGGLE;
         break;
 
         default:

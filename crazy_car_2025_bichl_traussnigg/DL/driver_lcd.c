@@ -75,6 +75,33 @@ void Driver_LCD_WriteText(char *text , unsigned char text_length , unsigned char
     }
 }
 
+void Driver_LCD_WriteNumber(int number, unsigned char number_length, unsigned char page, unsigned char col)
+{
+    char number_arr[7];
+    int i;
+    unsigned char is_negative = 0;
+
+    // TODO: fix negative numbers
+
+    if (number < 0) {
+        is_negative = 1;       // Negativflag setzen
+        number = -number;      // Zahl positiv machen
+    }
+
+//    for (i = 0; i < number_length; i++) {
+//        number_arr[i] = '0'; // '0'
+//    }
+
+    unsigned int var;
+    for (var = 0; var < number_length; var++) {
+        number_arr[number_length-var-1] = '0' + (number % 10); // index 48 = '0'
+        number = number/10;
+        if (is_negative && (var == number_length-1))
+            number_arr[number_length-var-1] = '-';
+    }
+    Driver_LCD_WriteText(number_arr, number_length, page, col);
+}
+
 void Driver_LCD_Clear()
 {
     unsigned char i, j;
@@ -109,5 +136,4 @@ void Driver_LCD_SetCursor(unsigned char page_sel , unsigned char col_sel)
     LCD_Pos_Array[2] = LSB_COL_ADDR+lsb_col; // LSB Column Address
 
     Driver_LCD_WriteCommand(LCD_Pos_Array, 3); // Send LCD_POS_Array commands to LCD
-    while(spi.Status.TxSuc == 0); // wait until data is transfered
 }
