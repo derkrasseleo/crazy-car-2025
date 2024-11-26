@@ -18,8 +18,8 @@ void HAL_TimerB0_Init() {
 //    TB0CCTL1 |= OUTMOD_7; // Set Outmode to Reset/Set
 //    TB0CCTL1 |= CCIE;
 
-    TB0CCR0 |= 7813; // 39063; // Should be 39062.5
-//    TB0CCR1 |= 7813; // 100 ms
+    TB0CCR0 |= 39063; // 7813=100ms/10Hz // 39063 for 0.5 Hz; // Should be 39062.5
+    TB0CCR1 |= 651; // 120Hz
 
     TB0CTL |= MC__UP;
 

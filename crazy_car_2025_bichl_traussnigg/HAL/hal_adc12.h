@@ -12,7 +12,7 @@ typedef struct {
     union{
         unsigned char R;
         struct {
-            unsigned char ADCrdy:1; // Bit=1 wenn Daten übertragen wurden
+            unsigned char ADCrdy:1; // Bit=1 wenn Daten uebertragen wurden
             unsigned char dummy:7;
         }B;
     }Status;

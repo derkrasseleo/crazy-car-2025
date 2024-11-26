@@ -5,6 +5,7 @@
 #include "hal_usciB1.h"
 #include "DL/driver_general.h"
 #include "DL/driver_lcd.h"
+#include "HAL/hal_adc12.h"
 
 extern ButtonCom button;
 extern USCIB1_SPICom spi;
@@ -21,23 +22,25 @@ int number = -100;
 int main(void)
 {
 	HAL_Init();
-	Driver_Init();
-
-	// TODO: Fix Crash when signal from hall sensor
+    Driver_Init();
 
     while (1) {
-
+        Driver_LCD_WriteText("HELLO", 5, 0, 0);
         Driver_SetThrottle(percent);
 //        number++;
-//        Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
+        // Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
 //        __delay_cycles(10000000);
 //        Driver_SetSteering(percent);
 
         if (button.active) {
             switch (button.button) {
                 case 1:
+                      Driver_LCD_WriteText("EWO", 3, 0, 0);
 //                    Driver_LCD_WriteText(test_text, 5, 0, 0);
-                    Driver_LCD_WriteNumber(speed, 6, 4, 0);
+//                    Driver_LCD_WriteNumber(adc.ADCBuffer[0], 6, 1, 0);
+//                    Driver_LCD_WriteNumber(adc.ADCBuffer[1], 6, 2, 0);
+//                    Driver_LCD_WriteNumber(adc.ADCBuffer[2], 6, 3, 0);
+//                    Driver_LCD_WriteNumber(adc.ADCBuffer[3], 6, 4, 0);
 
                     LCD_BACKLIGHT_ON;
 
@@ -47,7 +50,8 @@ int main(void)
 
                 case 2:
                     LCD_BACKLIGHT_OFF;
-                    Driver_LCD_Clear();
+//                    Driver_LCD_Clear();
+                    Driver_LCD_Init();
 //                    HAL_USCIB1_SPI_TEST();
                     if (percent > 0)
                         percent -= 5;
@@ -75,13 +79,13 @@ __interrupt void T0_ISR (void) {
     TB0CTL &= ~TBIFG;
 }
 
-#pragma vector = TIMER0_B1_VECTOR // (fuer CCR1)
-
-__interrupt void TB0_CCR1_ISR (void) {
-
-    Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
-    TB0CTL &= ~TBIFG;
-}
+//#pragma vector = TIMER0_B1_VECTOR // (fuer CCR1)
+//
+//__interrupt void TB0_CCR1_ISR (void) {
+//
+//    //Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
+//    TB0CTL &= ~TBIFG;
+//}
 //#pragma vector = TIMER1_A1_VECTOR // (fuer CCR1 und CCR2)
 //
 //__interrupt void T1_ISR (void) {

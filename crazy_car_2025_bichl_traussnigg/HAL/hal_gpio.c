@@ -83,9 +83,13 @@ void HAL_GPIO_Init() {
     P6OUT = 0x00;
     // Inputs
     setZero(P6DIR, DISTANCE_RIGHT);
+    setOne(P6SEL, DISTANCE_RIGHT);
     setZero(P6DIR, DISTANCE_LEFT);
+    setOne(P6SEL, DISTANCE_LEFT);
     setZero(P6DIR, DISTANCE_FRONT);
+    setOne(P6SEL, DISTANCE_FRONT);
     setZero(P6DIR, VBAT_MEASURE);
+    setOne(P6SEL, VBAT_MEASURE);
     // Outputs
     setOne(P6DIR, DISTANCE_LEFT_EN);
     // Port 7

@@ -2,6 +2,7 @@
 #include "hal_usciB1.h"
 #include "hal_gpio.h"
 #include <stdio.h>
+#include "HAL/hal_adc12.h"
 
 extern USCIB1_SPICom spi;
 extern ADC12Com adc;
@@ -48,6 +49,7 @@ __interrupt void USCI_B1_ISR(void)
 
     if ((UCB1IE & UCRXIE) && (spi.Status.TxSuc == 0))
     {
+        // TODO: fix off by one error, not sure if exactly here
         if(spi.TxData.cnt <= spi.TxData.len)
         {
             UCB1TXBUF = spi.TxData.Data[spi.TxData.cnt];
