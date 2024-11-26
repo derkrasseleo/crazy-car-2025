@@ -18,19 +18,35 @@ unsigned char speed_dd = 0;
 unsigned char percent = 50;
 char test_text[5] = {48, 49, 50, 51, 52};
 int number = -100;
+double pc_double = 0;
+int var;
 
 int main(void)
 {
 	HAL_Init();
     Driver_Init();
 
+    Driver_LCD_WriteText("RIGHT:", 6, 1, 0);
+    Driver_LCD_WriteText("LEFT :", 6, 2, 0);
+    Driver_LCD_WriteText("FRONT:", 6, 3, 0);
+    Driver_LCD_WriteText("VBAT :", 6, 4, 0);
+    Driver_LCD_WriteText("SPEED:", 6, 5, 0);
+    Driver_LCD_WriteText("PERCT:", 6, 6, 0);
+
     while (1) {
-//        Driver_LCD_WriteText("HELLO", 5, 0, 0);
+        for (var = 0; var < 4; ++var) {
+            Driver_LCD_WriteNumber(adc.ADCBuffer[var], 6, var+1, 6*6);
+        }
+//        Driver_LCD_WriteNumber(adc.ADCBuffer[0], 6, 1, 6*6);
+//        Driver_LCD_WriteNumber(adc.ADCBuffer[1], 6, 2, 6*6);
+//        Driver_LCD_WriteNumber(adc.ADCBuffer[2], 6, 3, 6*6);
+//        Driver_LCD_WriteNumber(adc.ADCBuffer[3], 6, 4, 6*6);
+        Driver_LCD_WriteNumber(speed, 6, 5, 6*6);
+        Driver_LCD_WriteNumber(percent, 6, 6, 6*6);
+
+        percent = (adc.ADCBuffer[2]/38); // map front sensor to motor speed
         Driver_SetThrottle(percent);
-//        number++;
-        // Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
-//        __delay_cycles(10000000);
-//        Driver_SetSteering(percent);
+        Driver_SetSteering(percent);
 
         if (button.active) {
             switch (button.button) {
@@ -61,7 +77,7 @@ int main(void)
                     break;
             }
         }
-        __delay_cycles(1000);
+//        __delay_cycles(1000);
         button.active = 0; // Reset button state
     }
 	return 0;
@@ -76,6 +92,7 @@ __interrupt void T0_ISR (void) {
     speed = (speed + speed_old) >> 1;
     speed_old = speed;
     ticks = 0;
+
     TB0CTL &= ~TBIFG;
 }
 
@@ -84,6 +101,7 @@ __interrupt void T0_ISR (void) {
 //__interrupt void TB0_CCR1_ISR (void) {
 //
 //    //Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
+//
 //    TB0CTL &= ~TBIFG;
 //}
 //#pragma vector = TIMER1_A1_VECTOR // (fuer CCR1 und CCR2)
