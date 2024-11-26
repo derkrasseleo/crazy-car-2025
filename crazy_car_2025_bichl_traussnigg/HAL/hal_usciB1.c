@@ -50,7 +50,7 @@ __interrupt void USCI_B1_ISR(void)
     if ((UCB1IE & UCRXIE) && (spi.Status.TxSuc == 0))
     {
         // TODO: fix off by one error, not sure if exactly here
-        if(spi.TxData.cnt <= spi.TxData.len)
+        if(spi.TxData.cnt < spi.TxData.len)
         {
             UCB1TXBUF = spi.TxData.Data[spi.TxData.cnt];
             spi.TxData.cnt++;

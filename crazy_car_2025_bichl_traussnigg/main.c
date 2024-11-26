@@ -25,7 +25,7 @@ int main(void)
     Driver_Init();
 
     while (1) {
-        Driver_LCD_WriteText("HELLO", 5, 0, 0);
+//        Driver_LCD_WriteText("HELLO", 5, 0, 0);
         Driver_SetThrottle(percent);
 //        number++;
         // Driver_LCD_WriteNumber(speed, 6, 4, 0); //  +-32766
@@ -35,12 +35,12 @@ int main(void)
         if (button.active) {
             switch (button.button) {
                 case 1:
-                      Driver_LCD_WriteText("EWO", 3, 0, 0);
+//                      Driver_LCD_WriteText("EWO", 3, 0, 0);
 //                    Driver_LCD_WriteText(test_text, 5, 0, 0);
-//                    Driver_LCD_WriteNumber(adc.ADCBuffer[0], 6, 1, 0);
-//                    Driver_LCD_WriteNumber(adc.ADCBuffer[1], 6, 2, 0);
-//                    Driver_LCD_WriteNumber(adc.ADCBuffer[2], 6, 3, 0);
-//                    Driver_LCD_WriteNumber(adc.ADCBuffer[3], 6, 4, 0);
+                    Driver_LCD_WriteNumber(adc.ADCBuffer[0], 6, 1, 0);
+                    Driver_LCD_WriteNumber(adc.ADCBuffer[1], 6, 2, 0);
+                    Driver_LCD_WriteNumber(adc.ADCBuffer[2], 6, 3, 0);
+                    Driver_LCD_WriteNumber(adc.ADCBuffer[3], 6, 4, 0);
 
                     LCD_BACKLIGHT_ON;
 
