@@ -37,10 +37,10 @@ int main(void)
         for (var = 0; var < 4; ++var) {
             Driver_LCD_WriteNumber(adc.ADCBuffer[var], 6, var+1, 6*6);
         }
-//        Driver_LCD_WriteNumber(adc.ADCBuffer[0], 6, 1, 6*6);
-//        Driver_LCD_WriteNumber(adc.ADCBuffer[1], 6, 2, 6*6);
-//        Driver_LCD_WriteNumber(adc.ADCBuffer[2], 6, 3, 6*6);
-//        Driver_LCD_WriteNumber(adc.ADCBuffer[3], 6, 4, 6*6);
+        Driver_LCD_WriteNumber(adc.ADCBuffer[0], 6, 1, 6*6);
+        Driver_LCD_WriteNumber(adc.ADCBuffer[1], 6, 2, 6*6);
+        Driver_LCD_WriteNumber(adc.ADCBuffer[2], 6, 3, 6*6);
+        Driver_LCD_WriteNumber(adc.ADCBuffer[3], 6, 4, 6*6);
         Driver_LCD_WriteNumber(speed, 6, 5, 6*6);
         Driver_LCD_WriteNumber(percent, 6, 6, 6*6);
 

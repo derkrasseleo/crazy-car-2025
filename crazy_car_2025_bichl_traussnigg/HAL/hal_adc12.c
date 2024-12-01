@@ -3,7 +3,7 @@
 #include "hal_gpio.h"
 #include "DL/driver_lcd.h"
 
-ADC12Com adc;
+extern ADC12Com adc;
 
 HAL_ADC12_Init(void)
 {
@@ -17,24 +17,9 @@ HAL_ADC12_Init(void)
     ADC12MCTL0 |= ADC12SREF_1 + ADC12INCH_0;
     ADC12MCTL1 |= ADC12SREF_1 + ADC12INCH_1;
     ADC12MCTL2 |= ADC12SREF_1 + ADC12INCH_2;
-    ADC12MCTL3 |= ADC12SREF_1 + ADC12INCH_3;
+    ADC12MCTL3 |= ADC12SREF_1 + ADC12INCH_3 + ADC12EOS;
 
-    ADC12IE |= ADC12IE3; // Enable interrupt for EOS
+    ADC12IE &= ~ADC12IE3; // Reset interrupt for DMA
 
     ADC12CTL0 |= ADC12ENC + ADC12ON;
-
-}
-
-#pragma vector = ADC12_VECTOR
-
-__interrupt void ADC12_ISR (void) {
-
-//    Driver_LCD_WriteText("ADC", 3, 0, 0);
-//    LCD_BACKLIGHT_OFF;
-    adc.ADCBuffer[0] = ADC12MEM0;
-    adc.ADCBuffer[1] = ADC12MEM1;
-    adc.ADCBuffer[2] = ADC12MEM2;
-    adc.ADCBuffer[3] = ADC12MEM3;
-    adc.Status.B.ADCrdy = 1;
-    ADC12IFG &= ~ADC12IFG;
 }
