@@ -20,8 +20,10 @@ __interrupt void DMA_ISR (void) {
     switch(DMAIV) // Interrupt is reset on DMAIV read
     {
     case 0:
+        adc.Status.B.dummy = 1;
         break;
     case 2:
+        adc.Status.B.ADCrdy = 1;
         break;
     default:
         break;

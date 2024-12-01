@@ -28,3 +28,9 @@ void HAL_TimerA1_Init() {
 
     //TA1CTL &= ~TBIFG; // Clear Interrupt flag
 }
+
+//#pragma vector = TIMER1_A1_VECTOR // (fuer CCR1 und CCR2)
+//
+//__interrupt void T1_ISR (void) {
+//
+//}
