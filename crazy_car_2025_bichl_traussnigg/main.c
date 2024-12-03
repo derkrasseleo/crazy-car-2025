@@ -6,7 +6,7 @@
 #include "DL/driver_general.h"
 #include "DL/driver_lcd.h"
 #include "HAL/hal_adc12.h"
-#include "HAL/hal_timerA0.h"
+//#include "HAL/hal_timerA0.h"
 
 void Display_Init(void);
 
@@ -89,11 +89,7 @@ __interrupt void TA0_ISR (void) {
     speed = (speed + speed_old) >> 1;
     speed_old = speed;
     ticks = 0;
-    TB0CCTL2 &= ~CCIFG;
-    if (TB0CCTL0 & CCIFG)
-    {
-        TB0CCTL0 &= ~CCIFG;
-    }
+    TA0CCTL0 &= ~CCIFG;
 }
 
 #pragma vector = PORT1_VECTOR
