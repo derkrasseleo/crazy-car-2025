@@ -8,6 +8,7 @@
 #include "hal_usciB1.h"
 #include "hal_dma.h"
 #include "hal_adc12.h"
+#include "hal_timerA0.h"
 
 ButtonCom button;
 USCIB1_SPICom spi;
@@ -20,7 +21,7 @@ void HAL_Init() {
     HAL_UCS_Init();
     HAL_TimerB0_Init();
     HAL_TimerA1_Init();
-//    HAL_TimerA0_Init();
+    HAL_TimerA0_Init();
     HAL_USCIB1_Init();
     HAL_ADC12_Init();
     HAL_DMA_Init();
