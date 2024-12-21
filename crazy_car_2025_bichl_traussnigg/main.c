@@ -42,7 +42,7 @@ int main(void)
             Driver_LCD_WriteNumber(speed, 6, 5, 6*6);
             Driver_LCD_WriteNumber(percent, 6, 6, 6*6);
         }
-        percent = (adc.ADCBuffer[2]/38); // map front sensor to motor speed
+        percent = 100-(adc.ADCBuffer[2]/38); // map front sensor to motor speed
         Driver_SetThrottle(percent);
         Driver_SetSteering(percent);
 
