@@ -8,18 +8,15 @@ const int MaxBreak = (MinFPW+MinRPW)/2;
 
 volatile int speed_controller_impuls = 0;
 
+const int steer_min = 2900;
+const int steer_max = 4300;
+int steer_pc = (steer_max-steer_min)/100;
+
+int mc_val;
+
 void Driver_SetSteering(unsigned char steer_angle_pc)
 {
-    int steer_min = 2900;
-    int steer_max = 4300;
-    int steer_pc = (steer_max-steer_min)/100;
-
     TA1CCR2 = steer_min+(steer_pc*steer_angle_pc);
-
-    //    if (TA1CCR2 < (steer_max-increment) && TA1CCR2 > (steer_min+increment))
-//        TA1CCR2 = steer_min+(steer_pc*steer_angle_pc);
-//    else
-//        TA1CCR2 = steer_min+((steer_max-steer_min)/2);
 }
 
 void Driver_SteeringInit(void)
@@ -29,9 +26,25 @@ void Driver_SteeringInit(void)
 
 void Driver_SetThrottle(signed char throttle_pc)
 {
-    int val = MinFPW+(throttle_pc*((MaxFPW-MinFPW)/100));
-    TA1CCR1 = val;
+    if (throttle_pc > 0)
+    {
+        // Vorwärtsbereich
+        mc_val = MinFPW + (throttle_pc * ((MaxFPW - MinFPW) / 100));
+    }
+    else if (throttle_pc == 0)
+    {
+        // Bremsen
+        mc_val = MaxBreak;
+    }
+    else if (throttle_pc < 0)
+    {
+        // Rückwärtsbereich
+        mc_val = MinRPW + (throttle_pc * ((MinRPW - MaxRPW) / 100));
+    }
+
+    TA1CCR1 = mc_val;
 }
+
 
 void createPulses(int pwm, int pulseDuration)
 {
@@ -52,11 +65,12 @@ void Driver_ESCInit(void)
     // TODO: Set throttle to 0;
 
     createPulses(MaxRPW,131);
-    createPulses(MinRPW,128); // 128
+    createPulses(MinRPW,128);
     createPulses(MinFPW,128);
     createPulses(MaxFPW,128);
 
     createPulses(MaxBreak, 30);
+    Driver_SetThrottle(50);
 }
 
 #pragma vector = TIMER1_A0_VECTOR // (fuer CCR0)
