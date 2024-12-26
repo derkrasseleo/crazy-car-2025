@@ -8,6 +8,7 @@
 #include "HAL/hal_adc12.h"
 #include "algorithm/algo.h"
 #include "HAL/hal_timerA0.h"
+#include "algorithm/algo.h"
 
 void Display_Init(void);
 
@@ -16,14 +17,16 @@ extern ADC12Com adc;
 
 extern unsigned char ticks;
 extern int speed;
+extern int state;
 
 unsigned char direction = 0;
 int cnt = 0;
-int perc_speed = 0;
-int perc_steer = 0;
+signed char perc_speed = 0;
+unsigned char perc_steer = 0;
 int ir_front_val = 0;
 int ir_left_val = 0;
 int ir_right_val = 0;
+int vbat = 0;
 
 unsigned char driving_status = 0;
 
@@ -37,8 +40,6 @@ int main(void)
     Driver_Init();
 
     Display_Init();
-    Driver_SetSteering(50);
-    Driver_SetThrottle(0);
 
     while (1) {
         cnt++;
@@ -49,16 +50,18 @@ int main(void)
             ir_front_val = ir_front[adc.ADCBuffer[2]>>3];
             ir_left_val = ir_left[adc.ADCBuffer[1]>>3];
             ir_right_val = ir_right[adc.ADCBuffer[0]>>3];
+            vbat = adc.ADCBuffer[3];
 
-            if(cnt >= 100) // use cnt to slow down display
+            if(cnt >= 10000) // use cnt to slow down display
             {
                 cnt = 0;
-                Driver_LCD_WriteNumber(ir_front_val, 6, 1, 6*6);
-                Driver_LCD_WriteNumber(ir_left_val, 6, 2, 6*6);
-                Driver_LCD_WriteNumber(ir_right_val, 6, 3, 6*6);
-                Driver_LCD_WriteNumber(adc.ADCBuffer[3], 6, 4, 6*6);
-                Driver_LCD_WriteNumber(speed, 6, 5, 6*6);
-                Driver_LCD_WriteNumber(perc_steer, 6, 6, 6*6);
+                Driver_LCD_WriteNumber(ir_front_val, 5, 1, 6*6);
+                Driver_LCD_WriteNumber(ir_left_val,  5, 2, 6*6);
+                Driver_LCD_WriteNumber(ir_right_val, 5, 3, 6*6);
+                Driver_LCD_WriteNumber(vbat,         5, 4, 6*6);
+                Driver_LCD_WriteNumber(speed,        5, 5, 6*6);
+                Driver_LCD_WriteNumber(perc_speed,   5, 6, 6*6);
+                Driver_LCD_WriteNumber(state,        5, 7, 6*6);
             }
 
             if(driving_status == 1)
@@ -69,7 +72,7 @@ int main(void)
             }
             else if(driving_status == 0)
             {
-                Driver_SetSteering(50);
+                Driver_SteeringInit();
                 Driver_SetThrottle(0);
             }
         }
@@ -105,6 +108,7 @@ void Display_Init(void)
     Driver_LCD_WriteText("VBAT :", 6, 4, 0);
     Driver_LCD_WriteText("SPEED:", 6, 5, 0);
     Driver_LCD_WriteText("PERCT:", 6, 6, 0);
+    Driver_LCD_WriteText("STATE:", 6, 7, 0);
 }
 
 #pragma vector = PORT1_VECTOR
