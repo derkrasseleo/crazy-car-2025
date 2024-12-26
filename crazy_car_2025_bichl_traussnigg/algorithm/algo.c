@@ -1,19 +1,31 @@
 #include "algo.h"
 
-enum {STOP, FORWARD, LEFT, RIGHT};
-static int state = FORWARD;
-
+enum {STOP, FORWARD, BACKWARDS, LEFT, RIGHT};
+int state = FORWARD;
 int sen_diff;
+extern int speed;
 
-void primitive_driving(int *perc_steer, int *perc_throttle, unsigned int front_sensor, unsigned int left_sensor, unsigned int right_sensor)
+void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, unsigned int front_sensor, unsigned int left_sensor, unsigned int right_sensor)
 {
     sen_diff = left_sensor - right_sensor;
-    *perc_throttle = 50;
+    //*perc_throttle = 40;
+
+    *perc_throttle = (300+(5*(front_sensor/15)))/10;
+
+    if(((front_sensor <= 40) && (left_sensor <= 40)) || ((front_sensor <= 40) && (right_sensor <= 45)))
+    {
+        state = BACKWARDS;
+    }
+
+    if(&perc_throttle >= 50 && front_sensor <= 500)
+    {
+        *perc_throttle = 0;
+    }
 
     switch(state)
     {
         case FORWARD:
-               *perc_steer = sen_diff/10;
+               *perc_steer = 50-(sen_diff>>4);
                if(left_sensor > front_sensor)
                {
                   state = LEFT;
@@ -23,15 +35,32 @@ void primitive_driving(int *perc_steer, int *perc_throttle, unsigned int front_s
                   state = RIGHT;
                }
             break;
+        case BACKWARDS:
+            *perc_throttle = -45;
+            if(left_sensor < right_sensor)
+            {
+                *perc_steer = 100;
+            }
+            else if(right_sensor < left_sensor)
+            {
+                *perc_steer = 0;
+            }
+            if(front_sensor >= 150)
+            {
+                *perc_throttle = 50;
+                state = FORWARD;
+            }
+            break;
+
         case LEFT:
-               *perc_steer = 100;
+               *perc_steer = 0;
                if(front_sensor > left_sensor)
                {
                   state = FORWARD;
                }
             break;
         case RIGHT:
-               *perc_steer = -100;
+               *perc_steer = 100;
                if(front_sensor > right_sensor)
                {
                   state = FORWARD;
