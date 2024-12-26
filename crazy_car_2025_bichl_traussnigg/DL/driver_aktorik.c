@@ -8,7 +8,7 @@ const int MaxBreak = (MinFPW+MinRPW)/2;
 
 volatile int speed_controller_impuls = 0;
 
-const int steer_min = 2900;
+const int steer_min = 2700;
 const int steer_max = 4300;
 int steer_pc = (steer_max-steer_min)/100;
 
