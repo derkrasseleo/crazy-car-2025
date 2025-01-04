@@ -63,6 +63,11 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                {
                    state = STOP;
                }
+               if(speed <= 1 && cnt_driving >= 1000)
+               {
+                   cnt_driving = 0;
+                   state = STUCK;
+               }
             break;
         case BACKWARDS:
             *perc_throttle = -50;
