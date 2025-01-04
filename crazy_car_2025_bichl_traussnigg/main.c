@@ -51,7 +51,7 @@ int main(void)
             ir_right_val = (ir_right_val+ir_right[adc.ADCBuffer[0]>>3])>>1;
             vbat = (vbat+adc.ADCBuffer[3])>>1; // max: 2500, 2400? min: 1300?
 
-            if(cnt >= 20000) // use cnt to slow down display
+            if(cnt >= 10000) // use cnt to slow down display
             {
                 cnt = 0;
                 Driver_LCD_WriteNumber(ir_front_val, 5, 0, 6*6);
@@ -82,13 +82,13 @@ int main(void)
                 case 1:
                     LCD_BACKLIGHT_ON;
                     Display_Init();
-                    driving_status = 1;
+                    driving_status = 0;
                     break;
 
                 case 2:
                     LCD_BACKLIGHT_OFF;
                     Driver_LCD_Clear();
-                    driving_status = 0;
+                    driving_status = 1;
                     break;
 
                 default:
