@@ -83,7 +83,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
             {
                 *perc_steer = 50;
             }
-            if(front_sensor >= 150)
+            if(front_sensor >= 200)
             {
                 *perc_throttle = 50;
                 state = FORWARD;
