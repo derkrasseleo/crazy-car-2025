@@ -8,10 +8,10 @@ int right_sensor_old;
 int left_sensor_old;
 int front_sen_diff;
 extern int speed;
-int cnt_state_left = 0;
-int cnt_state_right = 0;
 extern int vbat;
 int cnt_driving = 0;
+int cnt_state_left = 0;
+int cnt_state_right = 0;
 
 void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, unsigned int front_sensor, unsigned int left_sensor, unsigned int right_sensor)
 {
@@ -25,14 +25,19 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
     {
         *perc_throttle = 35;
     }
-    else if(vbat<2000)
-    {
-        // when battery low: min: 30%, max. 100%
-        *perc_throttle = (300+(7*(front_sensor/15)))/10;
-    }
+//    else if(vbat<2200)
+//    {
+//        // when battery low: min: 30%, max. 100%
+//        *perc_throttle =  40 + front_sensor >> 5;//(300+(5*(front_sensor/15)))/10
+//    }
+//    else if(vbat<=2000)
+//    {
+//        *perc_throttle = 0;
+//    }
     else
     {
         // when battery high: min: 30%, max. 70%
+        // *perc_throttle = 40 + front_sensor >> 5;
         *perc_throttle = (300+(4*(front_sensor/15)))/10;
     }
 
@@ -109,7 +114,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                   break;
                  }
                *perc_throttle = 35;
-               *perc_steer = 0;
+                *perc_steer = 0;
                if(front_sensor > left_sensor)
                {
                   state = FORWARD;
@@ -127,10 +132,26 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                {
                   state = FORWARD;
                }
-            break;
+           break;
         case STUCK:
-            state = BACKWARDS;
-            break;
+           *perc_throttle = -50;
+           if(left_sensor < right_sensor)
+           {
+               *perc_steer = 0;
+           }
+           else if(right_sensor < left_sensor)
+           {
+               *perc_steer = 100;
+           }
+           else if(lr_diff<=10)
+           {
+               *perc_steer = 40;
+           }
+           if(front_sensor >= 200)
+           {
+               state = FORWARD;
+           }
+           break;
         default:
 
             break;
