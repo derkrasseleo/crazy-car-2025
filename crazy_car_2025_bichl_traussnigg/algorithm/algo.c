@@ -50,7 +50,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
     switch(state)
     {
         case STOP:
-                *perc_throttle = 0;
+                *perc_throttle = -10;
                 state = FORWARD;
             break;
         case FORWARD:
