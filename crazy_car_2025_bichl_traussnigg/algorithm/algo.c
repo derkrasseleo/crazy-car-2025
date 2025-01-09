@@ -4,8 +4,12 @@ enum {STOP, FORWARD, BACKWARDS, LEFT, RIGHT, STUCK};
 int state = FORWARD;
 int lr_diff;
 int front_old = 0;
+int right_sensor_old;
+int left_sensor_old;
 int front_sen_diff;
 extern int speed;
+int cnt_state_left = 0;
+int cnt_state_right = 0;
 extern int vbat;
 int cnt_driving = 0;
 
@@ -54,12 +58,20 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                 state = FORWARD;
             break;
         case FORWARD:
-               *perc_steer = 50-(lr_diff>>4); // divide lr_diff by 8
-               if(left_sensor > front_sensor)
+               cnt_state_left = 0;
+               cnt_state_right = 0;
+//               if (right_sensor > 650) {
+//                   *perc_steer = 50-(lr_diff>>6); // divide lr_diff by 8
+//               }
+//               else {
+//                   *perc_steer = 50-(lr_diff>>4); // divide lr_diff by 8
+//               }
+               *perc_steer = 50-(lr_diff>>4);
+               if(left_sensor > front_sensor) //|| (left_sensor_old < 400 || left_sensor > 650))
                {
                   state = LEFT;
                }
-               else if(right_sensor > front_sensor)
+               else if(right_sensor > front_sensor) //|| (right_sensor_old < 500 || right_sensor > 650))
                {
                   state = RIGHT;
                }
@@ -91,6 +103,12 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
             break;
 
         case LEFT:
+               cnt_state_left++;
+               if (cnt_state_right>=7) {
+                  state = RIGHT;
+                  break;
+                 }
+               *perc_throttle = 35;
                *perc_steer = 0;
                if(front_sensor > left_sensor)
                {
@@ -98,6 +116,12 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                }
             break;
         case RIGHT:
+               cnt_state_right++;
+               if (cnt_state_left>=7) {
+                state = LEFT;
+                break;
+               }
+               *perc_throttle = 35;
                *perc_steer = 100;
                if(front_sensor > right_sensor)
                {
