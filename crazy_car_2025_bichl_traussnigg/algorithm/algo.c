@@ -19,7 +19,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     if(front_sen_diff<0)
     {
-        *perc_throttle = 40;
+        *perc_throttle = 35;
     }
     else if(vbat<2000)
     {
