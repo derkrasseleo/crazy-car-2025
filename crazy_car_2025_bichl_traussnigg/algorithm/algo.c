@@ -42,6 +42,10 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
         cnt_driving = 0;
         state = STUCK;
     }
+    if(front_sensor<1200 && speed>1500)
+    {
+        state = STOP;
+    }
 
     switch(state)
     {
@@ -58,10 +62,6 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                else if(right_sensor > front_sensor)
                {
                   state = RIGHT;
-               }
-               if(front_sensor<500 && speed>1800)
-               {
-                   state = STOP;
                }
                if(speed <= 1 && cnt_driving >= 1000)
                {
