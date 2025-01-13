@@ -5,19 +5,24 @@ int state = FORWARD;
 int lr_diff;
 int front_old = 0;
 int right_sensor_old;
+int right_sensor_diff;
 int left_sensor_old;
+int left_sensor_diff;
 int front_sen_diff;
 extern int speed;
 extern int vbat;
 int cnt_driving = 0;
 int cnt_state_left = 0;
 int cnt_state_right = 0;
+int max_block;
 
 void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, unsigned int front_sensor, unsigned int left_sensor, unsigned int right_sensor)
 {
     lr_diff = left_sensor - right_sensor;
     front_sen_diff = front_sensor-front_old;
     front_old = front_sensor;
+    left_sensor_diff = left_sensor_old - left_sensor;
+    right_sensor_diff = right_sensor_old - right_sensor;
 
     cnt_driving++;
 
@@ -65,6 +70,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
         case FORWARD:
                cnt_state_left = 0;
                cnt_state_right = 0;
+               max_block = 5;
 //               if (right_sensor > 650) {
 //                   *perc_steer = 50-(lr_diff>>6); // divide lr_diff by 8
 //               }
@@ -80,10 +86,36 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                {
                   state = RIGHT;
                }
+//               else if((front_sensor >= 1000) && (left_sensor_diff >= 500))
+//               {
+//                   max_block = 12;
+//                   state = LEFT;
+//               }
+//               else if((front_sensor >= 1000) && (right_sensor_diff >= 500))
+//               {
+//                   max_block = 12;
+//                   state = RIGHT;
+//               }
                if(speed <= 1 && cnt_driving >= 1000)
                {
                    cnt_driving = 0;
                    state = STUCK;
+               }
+//               if(cnt_state_left<=max_block)
+//               {
+//                   max_block = 5;
+//                   state = LEFT;
+//               }
+//               if(cnt_state_right<=max_block)
+//               {
+//                   max_block = 5;
+//                   state = RIGHT;
+//               }
+               // think about forward
+               if((left_sensor >= 600) && (right_sensor >= 600)) // && (front_sensor >= 700)
+               {
+                   state = LEFT;
+                   max_block = 50;
                }
             break;
         case BACKWARDS:
@@ -109,7 +141,8 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
         case LEFT:
                cnt_state_left++;
-               if (cnt_state_right>=7) {
+
+               if (cnt_state_right>=max_block) {
                   state = RIGHT;
                   break;
                  }
@@ -122,7 +155,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
             break;
         case RIGHT:
                cnt_state_right++;
-               if (cnt_state_left>=7) {
+               if (cnt_state_left>=max_block) {
                 state = LEFT;
                 break;
                }
