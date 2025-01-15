@@ -1,28 +1,30 @@
 #include "algo.h"
 
-enum {STOP, FORWARD, BACKWARDS, LEFT, RIGHT, STUCK};
-int state = FORWARD;
-int lr_diff;
-int front_old = 0;
-int right_sensor_old;
-int right_sensor_diff;
-int left_sensor_old;
-int left_sensor_diff;
-int front_sen_diff;
 extern int speed;
 extern int vbat;
+
+enum {STOP, FORWARD, BACKWARDS, LEFT, RIGHT, STUCK};
+int state = FORWARD;
+int lr_diff = 0;
+int front_old = 0;
+int right_sensor_old = 0;
+int left_sensor_old = 0;
+int right_sensor_diff = 0;
+int left_sensor_diff = 0;
+int front_sen_diff = 0;
 int cnt_driving = 0;
 int cnt_state_left = 0;
 int cnt_state_right = 0;
 int max_block;
+unsigned char cnt_curve;
 
 void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, unsigned int front_sensor, unsigned int left_sensor, unsigned int right_sensor)
 {
     lr_diff = left_sensor - right_sensor;
-    front_sen_diff = front_sensor-front_old;
-    front_old = front_sensor;
     left_sensor_diff = left_sensor_old - left_sensor;
     right_sensor_diff = right_sensor_old - right_sensor;
+    front_sen_diff = front_sensor-front_old;
+    front_old = front_sensor;
 
     cnt_driving++;
 
@@ -51,7 +53,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
         state = BACKWARDS;
     }
 
-    if(speed <= 1 && cnt_driving >= 1000)
+    if(speed <= 1 && cnt_driving >= 240)
     {
         cnt_driving = 0;
         state = STUCK;
@@ -67,57 +69,38 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                 *perc_throttle = -10;
                 state = FORWARD;
             break;
+
         case FORWARD:
                cnt_state_left = 0;
                cnt_state_right = 0;
                max_block = 5;
-//               if (right_sensor > 650) {
-//                   *perc_steer = 50-(lr_diff>>6); // divide lr_diff by 8
-//               }
-//               else {
-//                   *perc_steer = 50-(lr_diff>>4); // divide lr_diff by 8
-//               }
+
                *perc_steer = 50-(lr_diff>>4);
-               if(left_sensor > front_sensor) //|| (left_sensor_old < 400 || left_sensor > 650))
+
+               if(left_sensor > front_sensor)
                {
                   state = LEFT;
+                  if((left_sensor >= 659) && left_sensor_old <= 600)
+                  {
+                      max_block = 30;
+                  }
                }
                else if(right_sensor > front_sensor) //|| (right_sensor_old < 500 || right_sensor > 650))
                {
                   state = RIGHT;
+                  if(right_sensor >=659  && left_sensor_old <= 600)
+                  {
+                      max_block = 30;
+                  }
                }
-//               else if((front_sensor >= 1000) && (left_sensor_diff >= 500))
-//               {
-//                   max_block = 12;
-//                   state = LEFT;
-//               }
-//               else if((front_sensor >= 1000) && (right_sensor_diff >= 500))
-//               {
-//                   max_block = 12;
-//                   state = RIGHT;
-//               }
-               if(speed <= 1 && cnt_driving >= 1000)
-               {
-                   cnt_driving = 0;
-                   state = STUCK;
+               if ((cnt_state_right<=max_block) && (cnt_state_right > 0)) { // state == RIGHT &&
+                   state = RIGHT;
                }
-//               if(cnt_state_left<=max_block)
-//               {
-//                   max_block = 5;
-//                   state = LEFT;
-//               }
-//               if(cnt_state_right<=max_block)
-//               {
-//                   max_block = 5;
-//                   state = RIGHT;
-//               }
-               // think about forward
-               if((left_sensor >= 600) && (right_sensor >= 600)) // && (front_sensor >= 700)
-               {
+               else if ((cnt_state_left<=max_block) && (cnt_state_left > 0)) { // state == LEFT &&
                    state = LEFT;
-                   max_block = 50;
                }
             break;
+
         case BACKWARDS:
             *perc_throttle = -50;
             if(left_sensor < right_sensor)
@@ -140,32 +123,27 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
             break;
 
         case LEFT:
-               cnt_state_left++;
-
-               if (cnt_state_right>=max_block) {
-                  state = RIGHT;
-                  break;
-                 }
-               *perc_throttle = 35;
-                *perc_steer = 0;
-               if(front_sensor > left_sensor)
+                cnt_state_left++;
+               *perc_throttle = 40;
+               *perc_steer = 0;
+               if((front_sensor > left_sensor) && (cnt_state_left >= max_block))
                {
-                  state = FORWARD;
+                   cnt_curve++;
+                   state = FORWARD;
                }
             break;
+
         case RIGHT:
                cnt_state_right++;
-               if (cnt_state_left>=max_block) {
-                state = LEFT;
-                break;
-               }
-               *perc_throttle = 35;
+               *perc_throttle = 40;
                *perc_steer = 100;
-               if(front_sensor > right_sensor)
+               if((front_sensor > right_sensor) && (cnt_state_right >= max_block))
                {
-                  state = FORWARD;
+                   cnt_curve++;
+                   state = FORWARD;
                }
            break;
+
         case STUCK:
            *perc_throttle = -50;
            if(left_sensor < right_sensor)
@@ -185,8 +163,8 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                state = FORWARD;
            }
            break;
-        default:
 
+        default:
             break;
     }
 }
