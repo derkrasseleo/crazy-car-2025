@@ -21,6 +21,7 @@ void HAL_Init() {
     HAL_UCS_Init();
     HAL_TimerB0_Init();
     HAL_TimerA1_Init();
+    HAL_TimerA2_Init();
     HAL_TimerA0_Init();
     HAL_USCIB1_Init();
     HAL_ADC12_Init();
