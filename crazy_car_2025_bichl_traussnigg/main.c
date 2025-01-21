@@ -36,10 +36,20 @@ unsigned char ticks = 0;
 
 extern int right_sensor_diff;
 extern int left_sensor_diff;
+extern int cnt_curve;
 
 extern unsigned short ir_front[512];
 extern unsigned short ir_left[512];
 extern unsigned short ir_right[512];
+
+//unsigned char cnt_adc_rdy = 0;
+//const unsigned char MAX_CNT_ADC_RDY = 4;
+//unsigned short front_buffer[MAX_CNT_ADC_RDY];
+//unsigned short left_buffer[MAX_CNT_ADC_RDY];
+//unsigned short right_buffer[MAX_CNT_ADC_RDY];
+//
+//int front_sum = 0, left_sum = 0, right_sum = 0;
+//int var = 0;
 
 int main(void)
 {
@@ -53,23 +63,47 @@ int main(void)
         if (adc.Status.B.ADCrdy == 1)
         {
             adc.Status.B.ADCrdy = 0;
+//            if(cnt_adc_rdy < MAX_CNT_ADC_RDY)
+//            {
+//                front_buffer[cnt_adc_rdy] = adc.ADCBuffer[2];
+//                left_buffer[cnt_adc_rdy] = adc.ADCBuffer[1];
+//                right_buffer[cnt_adc_rdy] = adc.ADCBuffer[0];
+//                cnt_adc_rdy++;
+//            }
+//            else {
+//                cnt_adc_rdy = 0;
+//                for (var = 0; var < MAX_CNT_ADC_RDY; var++) {
+//                    front_sum += front_buffer[var];
+//                    left_sum += left_buffer[var];
+//                    right_sum += right_buffer[var];
+//                }
+//                ir_front_val = (front_sum)>>2;
+//                ir_left_val = (left_sum)>>2;
+//                ir_right_val = (right_sum)>>2;
+//
+//            }
             ir_front_val = (ir_front_val+ir_front[adc.ADCBuffer[2]>>3])>>1;
             ir_left_val = (ir_left_val+ir_left[adc.ADCBuffer[1]>>3])>>1;
             ir_right_val = (ir_right_val+ir_right[adc.ADCBuffer[0]>>3])>>1;
+//            ir_front_val = adc.ADCBuffer[2];
+//            ir_left_val = adc.ADCBuffer[1];
+//            ir_right_val = adc.ADCBuffer[0];
+
             vbat = (vbat+adc.ADCBuffer[3])>>1; // max: 2500, 2400? min: 1300?
 
             if(timer_a2_flag == 1) //(cnt >= 10000) // use cnt to slow down display
             {
                 timer_a2_flag = 0;
                 cnt++;
-                if (cnt == 3)
+                if (cnt == 30)
                 {
                     cnt = 0;
 
                     Driver_LCD_WriteNumber(ir_front_val, 5, 0, 6*6);
                     Driver_LCD_WriteNumber(ir_left_val,  5, 1, 6*6);
                     Driver_LCD_WriteNumber(ir_right_val, 5, 2, 6*6);
-                    Driver_LCD_WriteNumber(speed,        5, 3, 6*6);
+                    Driver_LCD_WriteNumber(cnt_curve,    5, 3, 6*6);
+                    //Driver_LCD_WriteNumber(speed,        5, 3, 6*6);
                     Driver_LCD_WriteNumber(vbat,         5, 4, 6*6);
                     //Driver_LCD_WriteNumber(perc_throt,   5, 5, 6*6);
                     Driver_LCD_WriteNumber(left_sensor_diff,   5, 5, 6*6);
@@ -90,6 +124,7 @@ int main(void)
                 {
                     Driver_SteeringInit();
                     Driver_SetThrottle(0);
+                    cnt_curve = 0;
                 }
             }
         }
@@ -123,7 +158,8 @@ void Display_Init(void)
     Driver_LCD_WriteText("FRONT:", 6, 0, 0);
     Driver_LCD_WriteText("LEFT :", 6, 1, 0);
     Driver_LCD_WriteText("RIGHT:", 6, 2, 0);
-    Driver_LCD_WriteText("SPEED:", 6, 3, 0);
+//    Driver_LCD_WriteText("SPEED:", 6, 3, 0);
+    Driver_LCD_WriteText("CNT_C:", 6, 3, 0);
     Driver_LCD_WriteText("VBAT :", 6, 4, 0);
     Driver_LCD_WriteText("LDIFF:", 6, 5, 0);
     Driver_LCD_WriteText("RDIFF:", 6, 6, 0);
