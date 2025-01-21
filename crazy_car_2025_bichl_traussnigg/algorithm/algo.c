@@ -16,22 +16,20 @@ int cnt_driving = 0;
 int cnt_state_left = 0;
 int cnt_state_right = 0;
 int max_block;
-unsigned char cnt_curve;
+int cnt_curve;
 
 void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, unsigned int front_sensor, unsigned int left_sensor, unsigned int right_sensor)
 {
     lr_diff = left_sensor - right_sensor;
-    left_sensor_diff = left_sensor_old - left_sensor;
-    right_sensor_diff = right_sensor_old - right_sensor;
+    left_sensor_diff = left_sensor - left_sensor_old;
+    right_sensor_diff = right_sensor - right_sensor_old;
     front_sen_diff = front_sensor-front_old;
     front_old = front_sensor;
+    left_sensor_old = left_sensor;
+    right_sensor_old = right_sensor;
 
     cnt_driving++;
 
-    if(front_sen_diff<0)
-    {
-        *perc_throttle = 35;
-    }
 //    else if(vbat<2200)
 //    {
 //        // when battery low: min: 30%, max. 100%
@@ -41,26 +39,28 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 //    {
 //        *perc_throttle = 0;
 //    }
-    else
-    {
-        // when battery high: min: 30%, max. 70%
-        // *perc_throttle = 40 + front_sensor >> 5;
-        *perc_throttle = (300+(4*(front_sensor/15)))/10;
-    }
+
+    //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
+    //*perc_throttle = 40; // for constant speed
+    *perc_throttle = (300+(5*(front_sensor/15)))/10;
 
     if(((front_sensor <= 40) && (left_sensor <= 40)) || ((front_sensor <= 40) && (right_sensor <= 45)))
     {
         state = BACKWARDS;
     }
 
-    if(speed <= 1 && cnt_driving >= 240)
+    if(speed <= 1 && cnt_driving >= 60)
     {
         cnt_driving = 0;
         state = STUCK;
     }
-    if(front_sensor<1200 && speed>1500)
+    if((state == FORWARD) && (front_sensor<1000) && (speed>1500))
     {
         state = STOP;
+    }
+    if(front_sen_diff<0 && speed > 1000)
+    {
+        *perc_throttle = -10;
     }
 
     switch(state)
@@ -73,31 +73,25 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
         case FORWARD:
                cnt_state_left = 0;
                cnt_state_right = 0;
-               max_block = 5;
+               max_block = 1;
 
-               *perc_steer = 50-(lr_diff>>4);
+               *perc_steer = 50-(lr_diff>>5);
 
-               if(left_sensor > front_sensor)
+               if((left_sensor > front_sensor) || (left_sensor_diff >= 500))
                {
+                  if((left_sensor >= 1000) && (right_sensor_diff <= 200))
+                  {
+                      max_block = 35;
+                  }
                   state = LEFT;
-                  if((left_sensor >= 659) && left_sensor_old <= 600)
-                  {
-                      max_block = 30;
-                  }
                }
-               else if(right_sensor > front_sensor) //|| (right_sensor_old < 500 || right_sensor > 650))
+               else if(right_sensor > front_sensor)
                {
-                  state = RIGHT;
-                  if(right_sensor >=659  && left_sensor_old <= 600)
+                  if((right_sensor >= 1000) && (right_sensor_diff >= 500))
                   {
                       max_block = 30;
                   }
-               }
-               if ((cnt_state_right<=max_block) && (cnt_state_right > 0)) { // state == RIGHT &&
-                   state = RIGHT;
-               }
-               else if ((cnt_state_left<=max_block) && (cnt_state_left > 0)) { // state == LEFT &&
-                   state = LEFT;
+                  state = RIGHT;
                }
             break;
 
@@ -158,7 +152,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
            {
                *perc_steer = 40;
            }
-           if(front_sensor >= 200)
+           if(front_sensor >= 200 && (left_sensor >= 40) && (right_sensor >= 40))
            {
                state = FORWARD;
            }
