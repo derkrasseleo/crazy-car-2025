@@ -24,6 +24,8 @@ int cnt_curve;
 const unsigned char direction = CCW;
 unsigned char last_state = FORWARD;
 
+int var = 0;
+
 int start_cnt_driving = 0;
 
 void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, unsigned int front_sensor, unsigned int left_sensor, unsigned int right_sensor)
@@ -97,34 +99,20 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                if (front_sensor > 1000 && left_sensor > 700 && left_sensor_diff > 300) {
                    state = DOUBLETURN;  // Double 180
                }
-               else if (front_sensor > 1000 && right_sensor > 700 && right_sensor_diff > 300) {
+               else if (front_sensor > 800 && right_sensor > 650 && right_sensor_diff > 200) {
                    state = TODESKREISEL;
                }
-               else
-               {
-               if (left_sensor_diff >= 300 || right_sensor_diff >= 300) {
-                   if (front_sensor < 1000) {
-                       if (left_sensor > front_sensor) {
-                           if (left_sensor >= 1200) {
-                               max_block = 30;  // Normal 90-degree curve
-                           }
-                           if (direction == CCW && cnt_curve >= 3) {
-                               max_block = 55;  // 180 degrees
-                           }
+               else if (left_sensor_diff >= 250 && left_sensor >= 1000) {
+
+                           max_block = 30;  // Normal 90-degree curve
                            state = LEFT;
                        }
-                       else if (right_sensor > front_sensor) {
-                           if (right_sensor >= 1200) {
-                               max_block = 37;  // Normal 90-degree curve
-                           }
-                           if ((direction == CW && cnt_curve >= 3) || (direction == CCW && cnt_curve >= 5)) {
-                               max_block = 55;  // Todeskreisel
-                           }
-                           state = RIGHT;
-                       }
-                   }
-               }
-               }
+               else if (right_sensor_diff >= 250 && right_sensor >= 1000) {
+
+                                          max_block = 30;  // Normal 90-degree curve
+                                          state = LEFT;
+                                      }
+
 
             break;
 
@@ -193,32 +181,32 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
            }
            break;
         case DOUBLETURN:
-
+            *perc_throttle = -20; //short beaking impulse
             cnt_state_doubleturn ++;
             if (cnt_state_doubleturn <= 50) {
-                *perc_throttle = 30;
+                *perc_throttle = 32;
                 *perc_steer = 0;
             }
-            else if (50 < cnt_state_doubleturn && cnt_state_doubleturn <= 170) {
+            else if (50 < cnt_state_doubleturn && cnt_state_doubleturn <= 165) {
                 *perc_throttle = 45;
                 *perc_steer = 50 - (lr_diff >> 5);
             }
-            else if (170 < cnt_state_doubleturn && cnt_state_doubleturn <= 200) {
-                *perc_throttle = 35;
+            else if (165 < cnt_state_doubleturn && cnt_state_doubleturn <= 200) {
+                *perc_throttle = 33;
                 *perc_steer = 100;
             }
-            if (cnt_state_doubleturn >= 250)
+            if (cnt_state_doubleturn >= 200)
                 state = FORWARD;
             break;
         case TODESKREISEL:
             cnt_state_todeskreisel ++;
             *perc_throttle = 40;
-            if (cnt_state_todeskreisel <= 45) {
+            if (cnt_state_todeskreisel <= 50) {
                 *perc_steer = 100;
             }
 
-            if (45< cnt_state_todeskreisel &&cnt_state_todeskreisel <= 75) {
-                *perc_steer = 0;
+            if (50< cnt_state_todeskreisel && cnt_state_todeskreisel <= 90) {
+                *perc_steer = 10;
             }
             if (cnt_state_todeskreisel >= 76)
                 state = FORWARD;
