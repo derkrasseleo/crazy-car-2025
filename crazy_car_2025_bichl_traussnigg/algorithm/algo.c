@@ -46,7 +46,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
     //*perc_throttle = 40; // for constant speed
-    *perc_throttle = (3000+(45*(front_sensor/15)))/100;
+    *perc_throttle = (3000+(60*(front_sensor/15)))/100;
 
     last_state = state;
 
@@ -93,11 +93,11 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                {
                   if((left_sensor >= 1000) && (right_sensor_diff <= 200))
                   {
-                      max_block = 35;
+                      max_block = 15; // for normal 90 degree curve
                   }
                   if(direction == CCW && cnt_curve >= 3)
                   {
-                      max_block = 60;
+                      max_block = 45;  // for 180 degrees
                   }
                   state = LEFT;
                }
@@ -105,11 +105,11 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                {
                   if((right_sensor >= 1000) && (right_sensor_diff >= 500))
                   {
-                      max_block = 35;
+                      max_block = 15; // for normal 90 degree curve
                   }
-                  if((direction == CW && cnt_curve >= 5) || (direction == CCW && cnt_curve >= 5))
+                  if((direction == CW && cnt_curve >= 3) || (direction == CCW && cnt_curve >= 5))
                   {
-                      max_block = 30;
+                      max_block = 45;  // for todeskreisel
                   }
                   state = RIGHT;
                }
