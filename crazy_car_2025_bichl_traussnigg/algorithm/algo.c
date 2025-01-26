@@ -3,7 +3,7 @@
 extern int speed;
 extern int vbat;
 
-enum {STOP, FORWARD, BACKWARDS, LEFT, RIGHT, STUCK};
+enum {STOP, FORWARD, BACKWARDS, LEFT, RIGHT, STUCK, DOUBLETURN , TODESKREISEL };
 enum {CW, CCW};
 int state = FORWARD;
 int lr_diff = 0;
@@ -17,10 +17,14 @@ int cnt_driving = 0;
 unsigned char cnt_state_left = 0;
 unsigned char cnt_state_right = 0;
 unsigned char cnt_state_forward = 0;
+unsigned char cnt_state_doubleturn = 0;
+unsigned char cnt_state_todeskreisel = 0;
 int max_block;
 int cnt_curve;
 const unsigned char direction = CCW;
 unsigned char last_state = FORWARD;
+
+int start_cnt_driving = 0;
 
 void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, unsigned int front_sensor, unsigned int left_sensor, unsigned int right_sensor)
 {
@@ -46,7 +50,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
     //*perc_throttle = 40; // for constant speed
-    *perc_throttle = (3500+(30*(front_sensor/15)))/100;
+    *perc_throttle = (3000+(30*(front_sensor/15)))/100;
 
     last_state = state;
 
@@ -79,6 +83,8 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
         case FORWARD:
                cnt_state_left = 0;
                cnt_state_right = 0;
+               cnt_state_doubleturn = 0;
+               cnt_state_todeskreisel = 0;
                cnt_state_forward++;
                max_block = 1;
 
@@ -88,44 +94,36 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                }
 
                *perc_steer = 50-(lr_diff>>5);
-               if(left_sensor_diff >= 500 || right_sensor_diff >= 500)
-               {
-                   if(front_sensor <1000)
-                   {
-                       if((left_sensor > front_sensor))
-                       {
-                          if((left_sensor >= 1200))
-                          {
-                              max_block = 30; // for normal 90 degree curve
-                          }
-                          if(direction == CCW && cnt_curve >= 3)
-                          {
-                              max_block = 55;  // for 180 degrees
-                          }
-                          state = LEFT;
-                       }
-                       else if(right_sensor > front_sensor)
-                       {
-                          if((right_sensor >= 1200))
-                          {
-                              max_block = 40; // for normal 90 degree curve
-                          }
-                          if((direction == CW && cnt_curve >= 3) || (direction == CCW && cnt_curve >= 5))
-                          {
-                              max_block = 55;  // for todeskreisel
-                          }
-                          state = RIGHT;
-                       }
-                   }
+               if (front_sensor > 1000 && left_sensor > 700 && left_sensor_diff > 300) {
+                   state = DOUBLETURN;  // Double 180
+               }
+               else if (front_sensor > 1000 && right_sensor > 700 && right_sensor_diff > 300) {
+                   state = TODESKREISEL;
+               }
                else
-                   {
-                       if((left_sensor > right_sensor))
-                         state = LEFT;
-                      else
-                         state = RIGHT;
-                      max_block = 60;
+               {
+               if (left_sensor_diff >= 300 || right_sensor_diff >= 300) {
+                   if (front_sensor < 1000) {
+                       if (left_sensor > front_sensor) {
+                           if (left_sensor >= 1200) {
+                               max_block = 30;  // Normal 90-degree curve
+                           }
+                           if (direction == CCW && cnt_curve >= 3) {
+                               max_block = 55;  // 180 degrees
+                           }
+                           state = LEFT;
+                       }
+                       else if (right_sensor > front_sensor) {
+                           if (right_sensor >= 1200) {
+                               max_block = 37;  // Normal 90-degree curve
+                           }
+                           if ((direction == CW && cnt_curve >= 3) || (direction == CCW && cnt_curve >= 5)) {
+                               max_block = 55;  // Todeskreisel
+                           }
+                           state = RIGHT;
+                       }
                    }
-
+               }
                }
 
             break;
@@ -194,7 +192,37 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                state = FORWARD;
            }
            break;
+        case DOUBLETURN:
 
+            cnt_state_doubleturn ++;
+            if (cnt_state_doubleturn <= 50) {
+                *perc_throttle = 30;
+                *perc_steer = 0;
+            }
+            else if (50 < cnt_state_doubleturn && cnt_state_doubleturn <= 170) {
+                *perc_throttle = 45;
+                *perc_steer = 50 - (lr_diff >> 5);
+            }
+            else if (170 < cnt_state_doubleturn && cnt_state_doubleturn <= 200) {
+                *perc_throttle = 35;
+                *perc_steer = 100;
+            }
+            if (cnt_state_doubleturn >= 250)
+                state = FORWARD;
+            break;
+        case TODESKREISEL:
+            cnt_state_todeskreisel ++;
+            *perc_throttle = 40;
+            if (cnt_state_todeskreisel <= 45) {
+                *perc_steer = 100;
+            }
+
+            if (45< cnt_state_todeskreisel &&cnt_state_todeskreisel <= 75) {
+                *perc_steer = 0;
+            }
+            if (cnt_state_todeskreisel >= 76)
+                state = FORWARD;
+            break;
         default:
             break;
     }
