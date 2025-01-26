@@ -18,7 +18,7 @@ extern unsigned char ticks;
 extern int speed;
 extern int state;
 
-unsigned char direction = 0;
+unsigned char car_direction = 0;
 int cnt = 0;
 signed char perc_throt = 0;
 unsigned char perc_steer = 0;
@@ -188,7 +188,7 @@ __interrupt void P1_ISR (void) {
         break;
         case RPM_SENSOR_DIR:
             // TODO: make speed value negative?
-            direction = 1-direction;
+            car_direction = 1-car_direction;
             P1IFG &= ~RPM_SENSOR_DIR;
 //            LCD_BACKLIGHT_TOGGLE;
         break;
