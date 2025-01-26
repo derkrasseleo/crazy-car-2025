@@ -46,7 +46,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
     //*perc_throttle = 40; // for constant speed
-    *perc_throttle = (3000+(30*(front_sensor/15)))/100;
+    *perc_throttle = (3500+(30*(front_sensor/15)))/100;
 
     last_state = state;
 
@@ -90,31 +90,44 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                *perc_steer = 50-(lr_diff>>5);
                if(left_sensor_diff >= 500 || right_sensor_diff >= 500)
                {
-                   if((left_sensor > front_sensor))
+                   if(front_sensor <1000)
                    {
-                      if((left_sensor >= 1200))
-                      {
-                          max_block = 10; // for normal 90 degree curve
-                      }
-                      if(direction == CCW && cnt_curve >= 3)
-                      {
-                          max_block = 45;  // for 180 degrees
-                      }
-                      state = LEFT;
+                       if((left_sensor > front_sensor))
+                       {
+                          if((left_sensor >= 1200))
+                          {
+                              max_block = 30; // for normal 90 degree curve
+                          }
+                          if(direction == CCW && cnt_curve >= 3)
+                          {
+                              max_block = 55;  // for 180 degrees
+                          }
+                          state = LEFT;
+                       }
+                       else if(right_sensor > front_sensor)
+                       {
+                          if((right_sensor >= 1200))
+                          {
+                              max_block = 40; // for normal 90 degree curve
+                          }
+                          if((direction == CW && cnt_curve >= 3) || (direction == CCW && cnt_curve >= 5))
+                          {
+                              max_block = 55;  // for todeskreisel
+                          }
+                          state = RIGHT;
+                       }
                    }
-                   else if(right_sensor > front_sensor)
+               else
                    {
-                      if((right_sensor >= 1200))
-                      {
-                          max_block = 10; // for normal 90 degree curve
-                      }
-                      if((direction == CW && cnt_curve >= 3) || (direction == CCW && cnt_curve >= 5))
-                      {
-                          max_block = 45;  // for todeskreisel
-                      }
-                      state = RIGHT;
+                       if((left_sensor > right_sensor))
+                         state = LEFT;
+                      else
+                         state = RIGHT;
+                      max_block = 60;
                    }
+
                }
+
             break;
 
         case BACKWARDS:
