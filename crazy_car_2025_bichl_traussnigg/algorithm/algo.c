@@ -52,8 +52,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
     //*perc_throttle = 40; // for constant speed
-    *perc_throttle = (3000+(30*(front_sensor/15)))/100;
-
+    *perc_throttle = (3300+(30*(front_sensor/15)))/100;
     last_state = state;
 
     if(((front_sensor <= 40) && (left_sensor <= 40)) || ((front_sensor <= 40) && (right_sensor <= 45)))
@@ -96,24 +95,23 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                }
 
                *perc_steer = 50-(lr_diff>>5);
+
+
                if (front_sensor > 1000 && left_sensor > 700 && left_sensor_diff > 300) {
                    state = DOUBLETURN;  // Double 180
                }
                else if (front_sensor > 800 && right_sensor > 650 && right_sensor_diff > 200) {
                    state = TODESKREISEL;
                }
-               else if (left_sensor_diff >= 250 && left_sensor >= 1000) {
+               else if (left_sensor_diff >= 250 && left_sensor >= 700) {
 
                            max_block = 30;  // Normal 90-degree curve
                            state = LEFT;
                        }
                else if (right_sensor_diff >= 250 && right_sensor >= 1000) {
-
-                                          max_block = 30;  // Normal 90-degree curve
-                                          state = LEFT;
-                                      }
-
-
+                              max_block = 30;  // Normal 90-degree curve
+                              state = RIGHT;
+                      }
             break;
 
         case BACKWARDS:
@@ -181,7 +179,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
            }
            break;
         case DOUBLETURN:
-            *perc_throttle = -20; //short beaking impulse
+            *perc_throttle = -20; //short beaking impulse => useless?
             cnt_state_doubleturn ++;
             if (cnt_state_doubleturn <= 50) {
                 *perc_throttle = 32;
@@ -212,7 +210,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                 state = FORWARD;
             break;
         default:
+            state = FORWARD;
             break;
     }
-
 }
