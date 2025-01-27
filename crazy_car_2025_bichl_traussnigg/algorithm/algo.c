@@ -180,18 +180,21 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
             cnt_state_doubleturn ++;
             if(direction == CCW)
             {
-                if (cnt_state_todeskreisel <= 20)
-                    *perc_throttle = -10;
-                    *perc_steer = 0;
-                if (20 < cnt_state_doubleturn <= 25) {
-                    *perc_throttle = 35;
-                    *perc_steer = 0;
+                if (cnt_state_todeskreisel <= 5)
+                {
+                    *perc_throttle = 30;
+                    *perc_steer = 60;
                 }
-                else if (25 < cnt_state_doubleturn && cnt_state_doubleturn <= 145) {
+                if (5 < cnt_state_doubleturn && cnt_state_doubleturn <= 65) {
+                    *perc_throttle = 45;
+                    *perc_steer = 10;
+                }
+                if (65 < cnt_state_doubleturn && cnt_state_doubleturn <= 135) {
                     //*perc_throttle = 50; normal speed calculation better
-                    *perc_steer = 50 - (lr_diff >> 5);
+                    *perc_throttle = 55;
+                    *perc_steer = 50 - (lr_diff >> 5);//
                 }
-                else if (155 < cnt_state_doubleturn && cnt_state_doubleturn <= 190) {
+                if (135 < cnt_state_doubleturn && cnt_state_doubleturn <= 190) {
                     *perc_throttle = 33;
                     *perc_steer = 100;
                 }
@@ -201,21 +204,25 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
             else if(direction == CW)
             {
                 if (cnt_state_todeskreisel <= 20)
-                    *perc_throttle = -10;
+                    *perc_throttle = 20;
                     *perc_steer = 0;
-                if (20 < cnt_state_doubleturn <= 30) {
-                    *perc_throttle = 32;
+                if (20 < cnt_state_doubleturn <= 25) {
+                    *perc_throttle = 35;
                     *perc_steer = 0;
                 }
-                else if (30 < cnt_state_doubleturn && cnt_state_doubleturn <= 175) {
-                    *perc_throttle = 45;
+                else if (25 < cnt_state_doubleturn && cnt_state_doubleturn <= 45) {
+                    *perc_throttle = 40;
+                    *perc_steer = 50 ;
+                }
+                else if (45 < cnt_state_doubleturn && cnt_state_doubleturn <= 145) {
+                    *perc_throttle = 40;
                     *perc_steer = 50 - (lr_diff >> 5);
                 }
-                else if (175 < cnt_state_doubleturn && cnt_state_doubleturn <= 220) {
+                else if (155 < cnt_state_doubleturn && cnt_state_doubleturn <= 190) {
                     *perc_throttle = 33;
                     *perc_steer = 100;
                 }
-                if (cnt_state_doubleturn >= 220)
+                if (cnt_state_doubleturn >= 190)
                     state = FORWARD;
             }
 
@@ -226,14 +233,14 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
             if(direction == CCW)
             {
                 if (cnt_state_todeskreisel <= 10)
-                    *perc_throttle = -10;
+                    *perc_throttle = 10;
                 else
-                    *perc_throttle = 40;
-                if (cnt_state_todeskreisel <= 45) {
-                    *perc_steer = 100;
+                    *perc_throttle = 45;
+                if (cnt_state_todeskreisel <= 50) {
+                    *perc_steer = 80;
                 }
 
-                if (45< cnt_state_todeskreisel && cnt_state_todeskreisel <= 115) {
+                if (50< cnt_state_todeskreisel && cnt_state_todeskreisel <= 115) {
                     *perc_steer = 15;
                 }
                 if (cnt_state_todeskreisel >= 95)
