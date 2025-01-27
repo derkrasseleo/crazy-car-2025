@@ -57,22 +57,24 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     if(((front_sensor <= 40) && (left_sensor <= 40)) || ((front_sensor <= 40) && (right_sensor <= 45)))
     {
-        state = BACKWARDS;
+        state = STUCK;
+    }
+    if(speed <= 1)
+    {
+        cnt_driving++;
     }
 
-    if(speed <= 1 && cnt_driving >= 60)
+    if(cnt_driving >= 60)
     {
         cnt_driving = 0;
         state = STUCK;
     }
-    if((state == FORWARD) && (front_sensor<600) && (speed>1500))
+
+    if((state == FORWARD) && front_sen_diff<0 && (speed>1500))
     {
         state = STOP;
     }
-    if(front_sen_diff<0 && speed > 1500)
-    {
-        *perc_throttle = -10;
-    }
+
     switch(state)
     {
         case STOP:
@@ -110,27 +112,6 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                               max_block = 15;  // Normal 90-degree curve
                               state = RIGHT;
                       }
-            break;
-
-        case BACKWARDS:
-            *perc_throttle = -50;
-            if(left_sensor < right_sensor)
-            {
-                *perc_steer = 0;
-            }
-            else if(right_sensor < left_sensor)
-            {
-                *perc_steer = 100;
-            }
-            else if(lr_diff<=10)
-            {
-                *perc_steer = 45;
-            }
-            if(front_sensor >= 200)
-            {
-                *perc_throttle = 50;
-                state = FORWARD;
-            }
             break;
 
         case LEFT:
