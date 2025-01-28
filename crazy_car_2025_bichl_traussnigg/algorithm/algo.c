@@ -13,7 +13,7 @@ int left_sensor_old = 0;
 int right_sensor_diff = 0;
 int left_sensor_diff = 0;
 int front_sen_diff = 0;
-int cnt_driving = 0;
+int cnt_stuck = 0;
 unsigned char cnt_state_left = 0;
 unsigned char cnt_state_right = 0;
 unsigned char cnt_state_forward = 0;
@@ -21,7 +21,7 @@ unsigned char cnt_state_doubleturn = 0;
 unsigned char cnt_state_todeskreisel = 0;
 int max_block;
 int cnt_curve;
-const unsigned char direction = CCW;
+const unsigned char direction = CW;
 unsigned char last_state = FORWARD;
 int todeskreisel = 0;
 int diffToLeft = 0;
@@ -39,7 +39,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
     left_sensor_old = left_sensor;
     right_sensor_old = right_sensor;
 
-    cnt_driving++;
+    cnt_stuck++;
 
 //    else if(vbat<2200)
 //    {
@@ -53,22 +53,24 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
     //*perc_throttle = 40; // for constant speed
-    *perc_throttle = (3600+(42*(front_sensor/15)))/100;
+    *perc_throttle = (3500+(40*(front_sensor/15)))/100;
     last_state = state;
 
-    if(((front_sensor <= 40) && (left_sensor <= 40)) || ((front_sensor <= 40) && (right_sensor <= 45)))
+    if((   (front_sensor <= 60 && left_sensor <= 60)
+        || (front_sensor <= 60 && right_sensor <= 60))
+        && speed <= 1000)
     {
         state = STUCK;
     }
 
     if(speed <= 1)
     {
-        cnt_driving++;
+        cnt_stuck++;
     }
 
-    if(cnt_driving >= 60)
+    if(cnt_stuck >= 60)
     {
-        cnt_driving = 0;
+        cnt_stuck = 0;
         state = STUCK;
     }
 
