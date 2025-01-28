@@ -60,6 +60,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
     {
         state = STUCK;
     }
+
     if(speed <= 1)
     {
         cnt_driving++;
@@ -98,23 +99,28 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
                *perc_steer = 50-(lr_diff>>5);
 
-               if (front_sensor > 1300 && left_sensor > 700 && left_sensor_diff > 300 && direction == CCW ) {
+               if (front_sensor > 1300 && left_sensor > 700 && left_sensor_diff > 300 && direction == CCW )
+               {
                    state = DOUBLETURN;  // Double 180 CCW
                }
-               if (front_sensor > 1300 && right_sensor > 1200 && right_sensor_diff > 400 && direction == CW ) {
+               if (front_sensor > 1300 && right_sensor > 1200 && right_sensor_diff > 400 && direction == CW )
+               {
                    state = TODESKREISEL;  // Todeskreisel 180 CW
                }
-               if (front_sensor > 1000 && right_sensor > 650  && direction == CCW) {
+               if (front_sensor > 1000 && right_sensor > 650  && direction == CCW)
+               {
                    state = TODESKREISEL; //Todeskreisel CCW
                }
-               if (left_sensor_diff >= 450 && left_sensor >= 1200 && front_sensor < 600 && right_sensor <= 800) {
-                           max_block = 15;  // Normal 90-degree curve
-                           state = LEFT;
-                       }
-               else if (right_sensor_diff >= 450 && right_sensor >= 1000 && left_sensor <= 800 && front_sensor < 600) {
-                              max_block = 15;  // Normal 90-degree curve
-                              state = RIGHT;
-                      }
+               if (left_sensor_diff >= 450 && left_sensor >= 1200 && front_sensor < 600 && right_sensor <= 800)
+               {
+                   max_block = 15;  // Normal 90-degree curve
+                   state = LEFT;
+               }
+               else if (right_sensor_diff >= 450 && right_sensor >= 1000 && left_sensor <= 800 && front_sensor < 600)
+               {
+                   max_block = 15;  // Normal 90-degree curve
+                   state = RIGHT;
+               }
             break;
 
         case LEFT:
