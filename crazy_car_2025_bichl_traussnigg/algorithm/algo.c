@@ -21,7 +21,7 @@ unsigned char cnt_state_doubleturn = 0;
 unsigned char cnt_state_todeskreisel = 0;
 int max_block;
 int cnt_curve;
-const unsigned char direction = CW;
+const unsigned char direction = CCW;
 unsigned char last_state = FORWARD;
 int todeskreisel = 0;
 int diffToLeft = 0;
@@ -109,7 +109,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                {
                    state = TODESKREISEL;  // Todeskreisel 180 CW
                }
-               if (front_sensor > 1000 && right_sensor > 650  && direction == CCW)
+               if (front_sensor > 1000 && right_sensor > 650  && right_sensor_diff > 200 && direction == CCW)
                {
                    state = TODESKREISEL; //Todeskreisel CCW
                }
