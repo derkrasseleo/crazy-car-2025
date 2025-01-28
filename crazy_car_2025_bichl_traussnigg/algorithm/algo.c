@@ -10,7 +10,7 @@ int lr_diff = 0;
 int front_old = 0;
 int right_sensor_old = 0;
 int left_sensor_old = 0;
-int right_sensor_diff = 0;
+int right_sensor_diff = -1;
 int left_sensor_diff = 0;
 int front_sen_diff = 0;
 int cnt_stuck = 0;
@@ -21,7 +21,7 @@ unsigned char cnt_state_doubleturn = 0;
 unsigned char cnt_state_todeskreisel = 0;
 int max_block;
 int cnt_curve;
-const unsigned char direction = CCW;
+const unsigned char direction = CW;
 unsigned char last_state = FORWARD;
 int todeskreisel = 0;
 int diffToLeft = 0;
@@ -44,7 +44,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 //    else if(vbat<2200)
 //    {
 //        // when battery low: min: 30%, max. 100%
-//        *perc_throttle =  40 + front_sensor >> 5;//(300+(5*(front_sensor/15)))/10
+//        perc_throttle =  40 + front_sensor >> 5;//(300+(5(front_sensor/15)))/10
 //    }
 //    else if(vbat<=2000)
 //    {
@@ -53,7 +53,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
     //*perc_throttle = 40; // for constant speed
-    *perc_throttle = (3500+(40*(front_sensor/15)))/100;
+    perc_throttle = (3500+(40(front_sensor/15)))/100;
     last_state = state;
 
     if((   (front_sensor <= 60 && left_sensor <= 60)
@@ -105,15 +105,12 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                {
                    state = DOUBLETURN;  // Double 180 CCW
                }
-               if (front_sensor > 1300 && right_sensor > 1200 && right_sensor_diff > 400 && direction == CW )
-               {
-                   state = TODESKREISEL;  // Todeskreisel 180 CW
-               }
-               if (front_sensor > 1000 && right_sensor > 650  && right_sensor_diff > 200 && direction == CCW)
+
+               else if (front_sensor > 1000 && right_sensor > 650  && right_sensor_diff > 200 && direction == CCW)
                {
                    state = TODESKREISEL; //Todeskreisel CCW
                }
-               if (left_sensor_diff >= 450 && left_sensor >= 1200 && front_sensor < 600 && right_sensor <= 800)
+               else if (left_sensor_diff >= 450 && left_sensor >= 1200 && front_sensor < 600 && right_sensor <= 800)
                {
                    max_block = 15;  // Normal 90-degree curve
                    state = LEFT;
@@ -193,33 +190,10 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                 if (cnt_state_doubleturn >= 210)
                     state = FORWARD;
             }
-            else if( direction == CW)
-            {
-                if (cnt_state_todeskreisel <=10)
-                {
-                    *perc_throttle = -25;
-                    *perc_steer = 60;
-                }
-                if (10 < cnt_state_doubleturn && cnt_state_doubleturn <= 65) {
-                    *perc_throttle = 45;
-                    *perc_steer = 0;
-                }
-                if (65 < cnt_state_doubleturn && cnt_state_doubleturn <= 160) {
-                    //*perc_throttle = 50; normal speed calculation better
-                    *perc_throttle = 55;
-                    *perc_steer = 47 - (lr_diff >> 5);//
-                }
-                if (160 < cnt_state_doubleturn && cnt_state_doubleturn <= 210) {
-                    *perc_throttle = 33;
-                    *perc_steer = 100;
-                }
-                if (cnt_state_doubleturn >= 210)
-                    state = FORWARD;
-            }
+
             break;
         case TODESKREISEL:
             cnt_state_todeskreisel ++;
-            *perc_throttle = 45;
             if(direction == CCW)
             {
                 if (cnt_state_todeskreisel <= 15)
@@ -236,27 +210,6 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
                 if (cnt_state_todeskreisel >= 95)
                     state = FORWARD;
             }
-            else if (direction == CW) // oh boy here we go pfusch again
-                //step 1 TODESKREISEL DURCH GEHEN
-                //rechtskurven time
-                *perc_throttle = 45;
-                if (cnt_state_todeskreisel <= 40)
-                {
-                    *perc_steer = 90;
-                }
-
-                if (40 < cnt_state_todeskreisel &&cnt_state_todeskreisel <= 65)
-                {
-                    *perc_steer = 25;
-                }
-                //Gerade
-                if (65< cnt_state_todeskreisel && cnt_state_todeskreisel <= 200) {
-                    *perc_steer = 50-(lr_diff>>5);
-                }
-                if (cnt_state_todeskreisel >= 200 || (cnt_state_todeskreisel >= 100 && front_sensor < 80))
-                    state = TODESKREISEL;
-
-
             break;
         default:
             state = FORWARD;
