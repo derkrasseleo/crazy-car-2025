@@ -52,7 +52,8 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
     //*perc_throttle = 40; // for constant speed
-    *perc_throttle = (3600+(42*(front_sensor/15)))/100;
+    *perc_throttle = (3700+(45*(front_sensor/15)))/100;
+
     last_state = state;
 
     if(((front_sensor <= 40) && (left_sensor <= 40)) || ((front_sensor <= 40) && (right_sensor <= 45)))
@@ -95,7 +96,6 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
                *perc_steer = 50-(lr_diff>>5);
 
-
                if (front_sensor > 1300 && left_sensor > 700 && left_sensor_diff > 300) {
                    state = DOUBLETURN;  // Double 180
                }
@@ -135,8 +135,8 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
         case LEFT:
                 cnt_state_left++;
-               *perc_throttle = 55;
-               *perc_steer = 35;
+               *perc_throttle = 45;
+               *perc_steer = 25;
                if((front_sensor > left_sensor) && (cnt_state_left >= max_block))
                {
                    cnt_curve++;
@@ -147,8 +147,8 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
         case RIGHT:
                cnt_state_right++;
-               *perc_throttle = 55;
-               *perc_steer = 75;
+               *perc_throttle = 45;
+               *perc_steer = 85;
                if((front_sensor > right_sensor) && (cnt_state_right >= max_block))
                {
                    cnt_curve++;
@@ -177,7 +177,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
            }
            break;
         case DOUBLETURN:
-            cnt_state_doubleturn ++;
+            cnt_state_doubleturn++;
             if(direction == CCW)
             {
                 if (cnt_state_todeskreisel <=10)
