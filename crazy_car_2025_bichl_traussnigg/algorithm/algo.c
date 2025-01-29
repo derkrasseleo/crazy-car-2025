@@ -53,7 +53,7 @@ void primitive_driving(unsigned char *perc_steer, signed char *perc_throttle, un
 
     //*perc_throttle = 50 + (front_sensor >> 5); // faster speed calculation
     //*perc_throttle = 40; // for constant speed
-    perc_throttle = (3500+(40(front_sensor/15)))/100;
+    *perc_throttle = (3500+(40*(front_sensor/15)))/100;
     last_state = state;
 
     if((   (front_sensor <= 60 && left_sensor <= 60)
